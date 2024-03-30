@@ -18,6 +18,7 @@ all: scanner etapa1
 
 scanner:scanner.l 
 	flex scanner.l
+	gcc -c $(ODIR)/lex.yy.c -o $(ODIR)/lex.yy.o
 
 etapa1: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
@@ -25,4 +26,4 @@ etapa1: $(OBJ)
 .PHONY:clean
 
 clean:
-	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ 
+	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ etapa1 $(ODIR)/lex.yy.c
