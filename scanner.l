@@ -3,7 +3,8 @@
 /* Matheus Almeida da Silva 00316326 */
 
 %{
-    #include "tokens.h"
+    #include <stdio.h>
+    #include "parser.tab.h"
 %}
 %option noyywrap
 %option yylineno
