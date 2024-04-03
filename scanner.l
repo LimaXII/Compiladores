@@ -6,10 +6,15 @@
     #include <stdio.h>
     #include "parser.tab.h"
 %}
+
 %option noyywrap
+/* Necessário para contar as linhas. */
 %option yylineno
+/* Estado especial para lidar com comentários multi-linha. */
 %s comment
+/* Expressão regular para detectar qualquer caractere especial. */
 special_char [-!*/%+<>{}()=,;] 
+/* Expressão regular para detectar espaço em branco. */
 whitespace [ \t\n\r]
 
 %%
@@ -29,8 +34,7 @@ whitespace [ \t\n\r]
 "&" {return TK_OC_AND;}
 "|" {return TK_OC_OR;}
 
-[a-z_]+[a-z_0-9]* {return TK_IDENTIFICADOR;}
-
+[a-z_]+[a-z_0-9]* {return TK_IDENTIFICADOR;} 
 [0-9]+ {return TK_LIT_INT;}
 [0-9]*"."[0-9]+ {return TK_LIT_FLOAT;}
 
@@ -47,9 +51,9 @@ whitespace [ \t\n\r]
 {special_char}  {return yytext[0];}
 
 . {return TK_ERRO;}
-
 %%
 
+// Função para retornar a linha atual.
 int get_line_number(void) {
     return yylineno;
 }
