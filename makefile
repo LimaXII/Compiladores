@@ -5,6 +5,9 @@ CFLAGS = -I$(IDIR)
 ODIR = ./
 LDIR = ./
 
+$(ODIR)/parser.tab.c: parser.y
+	bison -d $^ -o $@
+
 _OBJ = main.o lex.yy.o parser.tab.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
@@ -12,9 +15,6 @@ all: etapa2
 
 $(ODIR)/%.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
-
-$(ODIR)/parser.tab.c: parser.y
-	bison -d $^ -o $@
 
 $(ODIR)/lex.yy.c: scanner.l
 	flex -o $@ $^
