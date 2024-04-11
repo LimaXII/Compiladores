@@ -10,15 +10,15 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 all: etapa2
 
-# Bison command for parser
+# Comando do bison para gerar o parser.tab.c
 $(ODIR)/parser.tab.c $(ODIR)/parser.tab.h: parser.y
 	bison -d $< -o $(ODIR)/parser.tab.c
 
-# Pattern rule for .o files
+# Regra para arquivos .o
 $(ODIR)/%.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-# Flex command for scanner
+# Comando flex para o scanner.l
 $(ODIR)/lex.yy.c: scanner.l 
 	flex -o $@ $^
 
@@ -28,7 +28,7 @@ $(ODIR)/parser.tab.o: $(ODIR)/parser.tab.c
 $(ODIR)/lex.yy.o: $(ODIR)/lex.yy.c
 	$(CC) -c $< -o $@ $(CFLAGS)
 
-# Ensure main.c depends on parser.tab.h
+# Faz questão de que o arquivo paser.tab.h já esteja compilcado antes do main.c.
 $(ODIR)/main.o: main.c $(ODIR)/parser.tab.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
@@ -37,5 +37,6 @@ etapa2: $(OBJ)
 
 .PHONY: clean
 
+# Remove todos os arquivos necessários.
 clean:
 	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ etapa2 $(ODIR)/lex.yy.c $(ODIR)/parser.tab.c $(ODIR)/parser.tab.h
