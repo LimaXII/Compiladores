@@ -1,7 +1,8 @@
 int num,
 float arroz; feijao; goiaba,
 
-(int matheus; float luccas) | int / funcaoteste{
+() | bool / funcaoteste
+{
     num = 10,
     num = num * (20 - 30) + 40,
     while (true){

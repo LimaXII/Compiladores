@@ -1,3 +1,7 @@
+/* ======= GRUPO J ======= */
+/* Luccas da Silva Lima 00324683 */
+/* Matheus Almeida da Silva 00316326 */
+
 %{
 #include <stdio.h>
 // Importa as funções necessárias.
@@ -42,7 +46,7 @@ ident_list: ident_list ';' TK_IDENTIFICADOR | TK_IDENTIFICADOR;
 // -- Funções --
 function: header body;
 // Cabeçalho da função. Podendo conter uma lista de parametros ou nenhum parametro.
-header: '(' parameters_list ')' TK_OC_OR type '/' TK_IDENTIFICADOR | '('')' TK_OC_OR '/' TK_IDENTIFICADOR;
+header: '(' parameters_list ')' TK_OC_OR type '/' TK_IDENTIFICADOR | '('')' TK_OC_OR type '/' TK_IDENTIFICADOR;
 parameters_list: parameters_list ';' parameter | parameter;
 parameter: type TK_IDENTIFICADOR;
 // Corpo da função. Contendo um bloco de comandos.
@@ -87,5 +91,5 @@ literal: TK_LIT_INT | TK_LIT_FLOAT | TK_LIT_TRUE | TK_LIT_FALSE;
 // Função que imprime na tela o erro encontrado.
 void yyerror(char const *message)
 {
-    printf("Erro encontrado na linha %d: %s\n. ", get_line_number(), message);
+    printf("Erro encontrado na linha %d: %s\n", get_line_number(), message);
 }
