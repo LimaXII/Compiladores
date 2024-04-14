@@ -28,7 +28,7 @@ $(ODIR)/parser.tab.o: $(ODIR)/parser.tab.c
 $(ODIR)/lex.yy.o: $(ODIR)/lex.yy.c
 	$(CC) -c $< -o $@ $(CFLAGS)
 
-# Faz questão de que o arquivo paser.tab.h já esteja compilcado antes do main.c.
+# Faz questão de que o arquivo paser.tab.h já esteja compilado antes do main.c.
 $(ODIR)/main.o: main.c $(ODIR)/parser.tab.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
