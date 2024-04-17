@@ -106,9 +106,13 @@ expression2: expression2 '*' expression1
 | expression2 '/' expression1 
 | expression2 '%' expression1 
 | expression1;
-expression1: '!' expression0 
-|'-' expression0 
+// Grau 1 de precedencia. Pode ser uma ! ou - ou uma expressão mais prioritária.
+expression1: negation_expression expression0 
+|minus_expressison expression0 
 | expression0;
+
+negation_expression: negation_expression '!' | '!'
+minus_expressison: minus_expressison '-' | '-'
 
 expression0: operands 
 | '(' expression ')';
