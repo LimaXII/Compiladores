@@ -1,8 +1,7 @@
 typedef enum TokenType
 {
     IDENTIFIER,
-    LITERAL,
-    OTHERS
+    LITERAL
 } TokenType;
 
 typedef struct Valor_lexico

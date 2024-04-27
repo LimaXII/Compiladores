@@ -1,0 +1,60 @@
+# Executado assim: ./run.sh 
+# https://graphviz.org/doc/info/lang.html
+digraph {
+  x55c596d9c390 [label="f"];
+  x55c596d9c590 [label="="];
+  x55c596d9c5c0 [label="x"];
+  x55c596d9c560 [label="-"];
+  x55c596d9c420 [label="a"];
+  x55c596d9c530 [label=""];
+  x55c596d9c490 [label="b"];
+  x55c596d9c500 [label="c"];
+  x55c596d9c7c0 [label="="];
+  x55c596d9c7f0 [label="y"];
+  x55c596d9c790 [label="+"];
+  x55c596d9c6f0 [label="/"];
+  x55c596d9c650 [label="d"];
+  x55c596d9c6c0 [label="e"];
+  x55c596d9c760 [label="f"];
+  x55c596d9c9f0 [label="="];
+  x55c596d9ca20 [label="z"];
+  x55c596d9c9c0 [label="/"];
+  x55c596d9c940 [label="-"];
+  x55c596d9c8a0 [label="g"];
+  x55c596d9c910 [label="h"];
+  x55c596d9c990 [label="i"];
+  x55c596d9cc40 [label="="];
+  x55c596d9cc70 [label="w"];
+  x55c596d9cc10 [label=""];
+  x55c596d9cab0 [label="j"];
+  x55c596d9cbe0 [label="+"];
+  x55c596d9cb40 [label="k"];
+  x55c596d9cbb0 [label="l"];
+  x55c596d9c390 -> x55c596d9c590
+  x55c596d9c590 -> x55c596d9c5c0
+  x55c596d9c590 -> x55c596d9c560
+  x55c596d9c560 -> x55c596d9c420
+  x55c596d9c560 -> x55c596d9c530
+  x55c596d9c530 -> x55c596d9c490
+  x55c596d9c530 -> x55c596d9c500
+  x55c596d9c590 -> x55c596d9c7c0
+  x55c596d9c7c0 -> x55c596d9c7f0
+  x55c596d9c7c0 -> x55c596d9c790
+  x55c596d9c790 -> x55c596d9c6f0
+  x55c596d9c6f0 -> x55c596d9c650
+  x55c596d9c6f0 -> x55c596d9c6c0
+  x55c596d9c790 -> x55c596d9c760
+  x55c596d9c7c0 -> x55c596d9c9f0
+  x55c596d9c9f0 -> x55c596d9ca20
+  x55c596d9c9f0 -> x55c596d9c9c0
+  x55c596d9c9c0 -> x55c596d9c940
+  x55c596d9c940 -> x55c596d9c8a0
+  x55c596d9c940 -> x55c596d9c910
+  x55c596d9c9c0 -> x55c596d9c990
+  x55c596d9c9f0 -> x55c596d9cc40
+  x55c596d9cc40 -> x55c596d9cc70
+  x55c596d9cc40 -> x55c596d9cc10
+  x55c596d9cc10 -> x55c596d9cab0
+  x55c596d9cc10 -> x55c596d9cbe0
+  x55c596d9cbe0 -> x55c596d9cb40
+}
