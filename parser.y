@@ -4,11 +4,18 @@
 
 %{
 #include <stdio.h>
+#include "valor_lexico.h"
+
+
 // Importa as funções necessárias.
 int get_line_number();
 int yylex(void);
 void yyerror (char const *message);
 %}
+
+%union{
+    valor_lexico valor_lexico;
+}
 
 %define parse.error verbose
 
