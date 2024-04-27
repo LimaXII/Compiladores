@@ -5,16 +5,18 @@
 %{
 #include <stdio.h>
 #include "valor_lexico.h"
-
+#include "ast_tree.h"
 
 // Importa as funções necessárias.
 int get_line_number();
 int yylex(void);
 void yyerror (char const *message);
+extern void* arvore;
 %}
 
 %union{
-    valor_lexico valor_lexico;
+    Valor_lexico valor_lexico;
+    struct Node* node;
 }
 
 %define parse.error verbose
@@ -32,12 +34,41 @@ void yyerror (char const *message);
 %token TK_OC_NE
 %token TK_OC_AND
 %token TK_OC_OR
-%token TK_IDENTIFICADOR
-%token TK_LIT_INT
-%token TK_LIT_FLOAT
-%token TK_LIT_FALSE
-%token TK_LIT_TRUE
+%token<valor_lexico> TK_IDENTIFICADOR
+%token<valor_lexico> TK_LIT_INT
+%token<valor_lexico> TK_LIT_FLOAT
+%token<valor_lexico> TK_LIT_FALSE
+%token<valor_lexico> TK_LIT_TRUE
 %token TK_ERRO
+
+%type<node> program
+%type<node> elements_list
+%type<node> element
+%type<node> global_vars_declaration
+%type<node> function
+%type<node> type
+%type<node> ident_list
+%type<node> header
+%type<node> body
+%type<node> parameters_list
+%type<node> parameter
+%type<node> command_block
+%type<node> simple_command_list
+%type<node> command
+%type<node> attribution_command
+%type<node> function_call
+%type<node> return_command
+%type<node> control_command
+%type<node> arguments
+%type<node> expression
+%type<node> expression0
+%type<node> expression1
+%type<node> expression2
+%type<node> expression3
+%type<node> expression4
+%type<node> expression5
+%type<node> expression6
+%type<node> expression7
 
 %%
 
@@ -118,8 +149,10 @@ expression1: negation_expression expression0
 |minus_expressison expression0 
 | expression0;
 
-negation_expression: negation_expression '!' | '!'
-minus_expressison: minus_expressison '-' | '-'
+negation_expression: negation_expression '!' 
+| '!'
+minus_expressison: minus_expressison '-' 
+| '-' 
 
 expression0: operands 
 | '(' expression ')';
