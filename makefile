@@ -1,29 +1,42 @@
-IDIR=./
-CC=gcc
-CFLAGS=-I$(IDIR)
+IDIR = ./
+CC = gcc
+CFLAGS = -I$(IDIR)
 
-ODIR=./
-LDIR=./
+ODIR = ./
+LDIR = ./
 
-_DEPS= tokens.h
-DEPS=$(patsubst %,$(IDIR)/%,$(_DEPS))
+_OBJ = main.o lex.yy.o parser.tab.o 
+OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
-_OBJ= main.o lex.yy.o
-OBJ=$(patsubst %,$(ODIR)/%,$(_OBJ))
+all: etapa2
 
-$(ODIR)/%.o: %.c $(DEPS)
+# Comando do bison para gerar o parser.tab.c
+$(ODIR)/parser.tab.c $(ODIR)/parser.tab.h: parser.y
+	bison -d $< -o $(ODIR)/parser.tab.c
+
+# Regra para arquivos .o
+$(ODIR)/%.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-all: scanner etapa1
+# Comando flex para o scanner.l
+$(ODIR)/lex.yy.c: scanner.l 
+	flex -o $@ $^
 
-scanner:scanner.l 
-	flex scanner.l
-	gcc -c $(ODIR)/lex.yy.c -o $(ODIR)/lex.yy.o
+$(ODIR)/parser.tab.o: $(ODIR)/parser.tab.c
+	$(CC) -c $< -o $@ $(CFLAGS)
 
-etapa1: $(OBJ)
+$(ODIR)/lex.yy.o: $(ODIR)/lex.yy.c
+	$(CC) -c $< -o $@ $(CFLAGS)
+
+# Faz questão de que o arquivo paser.tab.h já esteja compilado antes do main.c.
+$(ODIR)/main.o: main.c $(ODIR)/parser.tab.h
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+etapa2: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
-.PHONY:clean
+.PHONY: clean
 
+# Remove todos os arquivos necessários.
 clean:
-	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ etapa1 $(ODIR)/lex.yy.c
+	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ etapa2 $(ODIR)/lex.yy.c $(ODIR)/parser.tab.c $(ODIR)/parser.tab.h
