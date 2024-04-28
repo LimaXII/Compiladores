@@ -5,6 +5,8 @@
 %{
     #include <stdio.h>
     #include "parser.tab.h"
+
+    #define YYSTYPE Valor_lexico
 %}
 
 %option noyywrap
@@ -21,8 +23,8 @@ whitespace [ \t\n\r]
 "int" {return TK_PR_INT;}
 "float" {return TK_PR_FLOAT;}
 "bool" {return TK_PR_BOOL;}
-"true" {return TK_LIT_TRUE;}
-"false" {return TK_LIT_FALSE;}
+"true" { yylval.Valor_lexico = createValor_lexico(yytext, LITERAL, yylineno); return TK_LIT_TRUE; }
+"false" { yylval.Valor_lexico = createValor_lexico(yytext, LITERAL, yylineno); return TK_LIT_FALSE; }
 "if" {return TK_PR_IF;}
 "else" {return TK_PR_ELSE;}
 "while" {return TK_PR_WHILE;}
@@ -34,9 +36,10 @@ whitespace [ \t\n\r]
 "&" {return TK_OC_AND;}
 "|" {return TK_OC_OR;}
 
-[a-z_]+[a-z_0-9]* {return TK_IDENTIFICADOR;} 
-[0-9]+ {return TK_LIT_INT;}
-[0-9]*"."[0-9]+ {return TK_LIT_FLOAT;}
+[a-z_]+[a-z_0-9]* { yylval.Valor_lexico = createValor_lexico(yytext, IDENTIFIER, yylineno); return TK_IDENTIFICADOR;} 
+[0-9]+ { yylval.Valor_lexico = createValor_lexico(yytext, LITERAL, yylineno); return TK_LIT_INT;}
+[0-9]*"."[0-9]+ { yylval.Valor_lexico = createValor_lexico(yytext, LITERAL, yylineno); return TK_LIT_FLOAT;}
+
 
 "//".* { }
 

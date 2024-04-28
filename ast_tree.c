@@ -1,24 +1,30 @@
+/* ======= GRUPO J ======= */
+/* Luccas da Silva Lima 00324683 */
+/* Matheus Almeida da Silva 00316326 */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "ast_tree.h"
 
-// Função para criar um novo nó
+// Função para criar um novo nodo.
 Node* create_node(Valor_lexico valor_lexico) {
-    Node* new_node = (Node*)malloc(sizeof(Node));
+    // Aloca memória do tamanho de um nodo.
+    Node* new_node = (Node*)malloc(sizeof(Node));       
     if (new_node == NULL) {
         fprintf(stderr, "Erro ao alocar memória para um novo nó.\n");
         exit(1);
     }
-    new_node->valor_lexico = valor_lexico;
+    // Atribui os valores do nodo. Depois retorna o novo nodo criado.
+    new_node->valor_lexico = valor_lexico;      
     new_node->children = NULL;
     new_node->daddy = NULL;
     new_node->child_count = 0;
     return new_node;
 }
 
-// Função para adicionar um filho a um nó
+// Função para adicionar um nodo a um nó.
 void add_child(Node* parent, Node* child) {
-    parent->child_count++;
+    parent->child_count++;         // Incrementa o número de filhos.
     parent->children = (Node**)realloc(parent->children, parent->child_count * sizeof(Node*));
     if (parent->children == NULL) {
         fprintf(stderr, "Erro ao realocar memória para adicionar um novo filho.\n");
@@ -28,7 +34,8 @@ void add_child(Node* parent, Node* child) {
     child->daddy = parent;
 }
 
-// Função para imprimir a árvore recursivamente
+// Função para percorrer e imprimir a árvore, recursivamente.
+// Imprime no formato: 0x8235900 [label="minha_funcao"];
 void print_tree_labels(Node* node) {
     if (node == NULL) return;
     printf("%p [label=\"%s\"];\n", node, node->valor_lexico.token_val);
@@ -37,7 +44,8 @@ void print_tree_labels(Node* node) {
     }
 }
 
-// Função para imprimir a hierarquia da árvore
+// Função para percorrer e imprimir a árvore, recursivamente.
+// Imprime no formato: 0x8235900, 0x82358e8.
 void print_tree_hierarchy(Node* node) {
     if (node == NULL) return;
     for (int i = 0; i < node->child_count; i++) {
@@ -56,10 +64,13 @@ void free_tree(Node* node) {
     free(node);
 }
 
-// Função para exportar a árvore (implementação vazia conforme solicitado)
+// Função para exportar a árvore.
 void exporta(Node* node) {
     if (node == NULL) return;
 
+    // Caso a árvore não seja vazia. Imprime a arvore nos dois formatos solicitados.
+    // 1. 0x8235900 [label="minha_funcao"];
+    // 2. 0x8235900, 0x82358e8.
     print_tree_labels(node);
     print_tree_hierarchy(node);
 }
