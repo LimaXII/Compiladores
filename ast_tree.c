@@ -71,7 +71,7 @@ void add_child(Node* parent, Node* child) {
 // Imprime no formato: 0x8235900 [token_val="minha_funcao"];
 void print_tree_token_vals(Node* node) {
     if (node == NULL) return;
-    printf("%p [token_val=\"%s\"];\n", node, node->valor_lexico.token_val);
+    printf("%p [label=\"%s\"];\n", node, node->valor_lexico.token_val);
     for (int i = 0; i < node->child_count; i++) {
         print_tree_token_vals(node->children[i]);
     }

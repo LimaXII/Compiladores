@@ -9,5 +9,6 @@ TEST_PATH=./e3_tests
 
 ARQUIVO_ENTRADA=$1
 
+./etapa3 < teste.txt > output.txt
 source output2dot.sh < "$ARQUIVO_ENTRADA" > "$TEST_PATH/saida.dot"
 dot -Tpng "$TEST_PATH/saida.dot" -o "$TEST_PATH/saida.png"

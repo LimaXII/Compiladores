@@ -1,57 +1,10 @@
-0x55c596d9c390 [label="f"];
-0x55c596d9c590 [label="="];
-0x55c596d9c5c0 [label="x"];
-0x55c596d9c560 [label="-"];
-0x55c596d9c420 [label="a"];
-0x55c596d9c530 [label=""];
-0x55c596d9c490 [label="b"];
-0x55c596d9c500 [label="c"];
-0x55c596d9c7c0 [label="="];
-0x55c596d9c7f0 [label="y"];
-0x55c596d9c790 [label="+"];
-0x55c596d9c6f0 [label="/"];
-0x55c596d9c650 [label="d"];
-0x55c596d9c6c0 [label="e"];
-0x55c596d9c760 [label="f"];
-0x55c596d9c9f0 [label="="];
-0x55c596d9ca20 [label="z"];
-0x55c596d9c9c0 [label="/"];
-0x55c596d9c940 [label="-"];
-0x55c596d9c8a0 [label="g"];
-0x55c596d9c910 [label="h"];
-0x55c596d9c990 [label="i"];
-0x55c596d9cc40 [label="="];
-0x55c596d9cc70 [label="w"];
-0x55c596d9cc10 [label=""];
-0x55c596d9cab0 [label="j"];
-0x55c596d9cbe0 [label="+"];
-0x55c596d9cb40 [label="k"];
-0x55c596d9cbb0 [label="l"];
-0x55c596d9c390, 0x55c596d9c590
-0x55c596d9c590, 0x55c596d9c5c0
-0x55c596d9c590, 0x55c596d9c560
-0x55c596d9c560, 0x55c596d9c420
-0x55c596d9c560, 0x55c596d9c530
-0x55c596d9c530, 0x55c596d9c490
-0x55c596d9c530, 0x55c596d9c500
-0x55c596d9c590, 0x55c596d9c7c0
-0x55c596d9c7c0, 0x55c596d9c7f0
-0x55c596d9c7c0, 0x55c596d9c790
-0x55c596d9c790, 0x55c596d9c6f0
-0x55c596d9c6f0, 0x55c596d9c650
-0x55c596d9c6f0, 0x55c596d9c6c0
-0x55c596d9c790, 0x55c596d9c760
-0x55c596d9c7c0, 0x55c596d9c9f0
-0x55c596d9c9f0, 0x55c596d9ca20
-0x55c596d9c9f0, 0x55c596d9c9c0
-0x55c596d9c9c0, 0x55c596d9c940
-0x55c596d9c940, 0x55c596d9c8a0
-0x55c596d9c940, 0x55c596d9c910
-0x55c596d9c9c0, 0x55c596d9c990
-0x55c596d9c9f0, 0x55c596d9cc40
-0x55c596d9cc40, 0x55c596d9cc70
-0x55c596d9cc40, 0x55c596d9cc10
-0x55c596d9cc10, 0x55c596d9cab0
-0x55c596d9cc10, 0x55c596d9cbe0
-0x55c596d9cbe0, 0x55c596d9cb40
-0x55c596d9cbe0, 0x55c596d9cbb0
+int k,
+
+() | bool / funcaoteste
+{
+    num = 10,
+    num = num * (20 - 30) + 40,
+    if (true){
+        num = 20 * 30,
+    },
+}
