@@ -22,6 +22,21 @@ Node* create_node(Valor_lexico valor_lexico) {
     return new_node;
 }
 
+Node* create_node_to_function(Valor_lexico valor_lexico) {
+    Node* node = createNode(valor_lexico);
+
+    char* start = "call ";
+    char* newtoken_val = malloc(strlen(start) + strlen(node->valor_lexico.token_val) + 1);
+
+    strcpy(newtoken_val, start);
+    strcat(newtoken_val, node->valor_lexico.token_val);
+
+    free(node->valor_lexico.token_val);
+    node->valor_lexico.token_val = newtoken_val;
+
+    return node;
+}
+
 // Função para adicionar um nodo a um nó.
 void add_child(Node* parent, Node* child) {
     parent->child_count++;         // Incrementa o número de filhos.
@@ -35,12 +50,12 @@ void add_child(Node* parent, Node* child) {
 }
 
 // Função para percorrer e imprimir a árvore, recursivamente.
-// Imprime no formato: 0x8235900 [label="minha_funcao"];
-void print_tree_labels(Node* node) {
+// Imprime no formato: 0x8235900 [token_val="minha_funcao"];
+void print_tree_token_vals(Node* node) {
     if (node == NULL) return;
-    printf("%p [label=\"%s\"];\n", node, node->valor_lexico.token_val);
+    printf("%p [token_val=\"%s\"];\n", node, node->valor_lexico.token_val);
     for (int i = 0; i < node->child_count; i++) {
-        print_tree_labels(node->children[i]);
+        print_tree_token_vals(node->children[i]);
     }
 }
 
@@ -69,9 +84,9 @@ void exporta(Node* node) {
     if (node == NULL) return;
 
     // Caso a árvore não seja vazia. Imprime a arvore nos dois formatos solicitados.
-    // 1. 0x8235900 [label="minha_funcao"];
+    // 1. 0x8235900 [token_val="minha_funcao"];
     // 2. 0x8235900, 0x82358e8.
-    print_tree_labels(node);
+    print_tree_token_vals(node);
     print_tree_hierarchy(node);
 }
 
@@ -94,7 +109,7 @@ int main() {
     add_child(child1, child3);
     add_child(child1, child4);
 
-    print_tree_labels(root);
+    print_tree_token_vals(root);
     print_tree_hierarchy(root);
     free_tree(root);
 
