@@ -1,4 +1,11 @@
 # Executado assim: ./run.sh output.txt
 # https://graphviz.org/doc/info/lang.html
 digraph {
+  x5564c6189740 [label="fd"];
+  x5564c6189610 [label="fc"];
+  x5564c61894e0 [label="fb"];
+  x5564c61893d0 [label="fa"];
+  x5564c6189740 -> x5564c6189610
+  x5564c6189610 -> x5564c61894e0
+  x5564c61894e0 -> x5564c61893d0
 }

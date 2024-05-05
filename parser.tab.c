@@ -1519,7 +1519,7 @@ yyreduce:
 {
     (yyval.node) = (yyvsp[0].node);
     if ((yyvsp[0].node) && (yyvsp[-1].node)){
-        add_child((yyval.node), (yyvsp[-1].node));
+        add_child((yyvsp[0].node), (yyvsp[-1].node));
     }
 }
 #line 1526 ".//parser.tab.c"
