@@ -12,7 +12,8 @@
 typedef enum TokenType
 {
     IDENTIFIER,
-    LITERAL
+    LITERAL,
+    OTHER
 } TokenType;
 
 // Define o Valor_lexico. 

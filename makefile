@@ -5,7 +5,7 @@ CFLAGS = -I$(IDIR)
 ODIR = ./
 LDIR = ./
 
-_OBJ = main.o lex.yy.o parser.tab.o 
+_OBJ = main.o lex.yy.o parser.tab.o valor_lexico.o ast_tree.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 all: etapa3

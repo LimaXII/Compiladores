@@ -17,30 +17,30 @@ extern void* arvore;
 %union{
     Valor_lexico valor_lexico;
     struct Node* node;
-    char* ast_token_val;
+    char* ast_token;
 }
 
 %define parse.error verbose
 
-%token <valor_lexico>TK_PR_INT
-%token <valor_lexico>TK_PR_FLOAT
-%token <valor_lexico>TK_PR_BOOL
-%token<ast_token_val> TK_PR_IF
+%token TK_PR_INT
+%token TK_PR_FLOAT
+%token TK_PR_BOOL
+%token<ast_token> TK_PR_IF
 %token TK_PR_ELSE
-%token<ast_token_val> TK_PR_WHILE
-%token<ast_token_val> TK_PR_RETURN
-%token<valor_lexico> TK_OC_LE
-%token<ast_token_val> TK_OC_GE
-%token<ast_token_val> TK_OC_EQ
-%token<ast_token_val> TK_OC_NE
-%token<ast_token_val> TK_OC_AND
-%token<ast_token_val> TK_OC_OR
+%token<ast_token> TK_PR_WHILE
+%token<ast_token> TK_PR_RETURN
+%token<ast_token> TK_OC_LE
+%token<ast_token> TK_OC_GE
+%token<ast_token> TK_OC_EQ
+%token<ast_token> TK_OC_NE
+%token<ast_token> TK_OC_AND
+%token<ast_token> TK_OC_OR
 %token<valor_lexico> TK_IDENTIFICADOR
 %token<valor_lexico> TK_LIT_INT
 %token<valor_lexico> TK_LIT_FLOAT
 %token<valor_lexico> TK_LIT_FALSE
 %token<valor_lexico> TK_LIT_TRUE
-%token<valor_lexico> '=' '<' '>' '+' '-' '*' '/' '%' '!' '(' ')'
+%token<ast_token> '=' '<' '>' '+' '-' '*' '/' '%' '!' '(' ')'
 
 %token TK_ERRO
 
@@ -134,11 +134,11 @@ function: header body
 // Cabeçalho da função. Podendo conter uma lista de parametros ou nenhum parametro.
 header: '(' parameters_list ')' TK_OC_OR type '/' TK_IDENTIFICADOR 
 {
-    $$ = create_node($7);
+    $$ = create_node_valor_lexico($7);
 }
 | '('')' TK_OC_OR type '/' TK_IDENTIFICADOR
 {
-    $$ = create_node($6);
+    $$ = create_node_valor_lexico($6);
 };
 parameters_list: parameters_list ';' parameter 
 {
@@ -209,40 +209,40 @@ command: command_block ','
 };
 attribution_command: TK_IDENTIFICADOR '=' expression
 {
-    $$ = create_node($2);
-    add_child($$, create_node($1));
+    $$ = create_node_token($2);
+    add_child($$, create_node_valor_lexico($1));
     add_child($$, $3);
 };
 function_call: TK_IDENTIFICADOR '(' arguments ')'
 {
-    $$ = create_node_to_function($1);
+    $$ = create_node_function($1);
     add_child($$, $3);
 } 
 | TK_IDENTIFICADOR '('')'
 {
-    $$ = create_node_to_function($1);
+    $$ = create_node_function($1);
 };
 return_command: TK_PR_RETURN expression
 {
-    $$ = create_node($1);
+    $$ = create_node_token($1);
     add_child($$, $2);
 };
 control_command: TK_PR_IF '(' expression ')' command_block 
 {
-    $$ = create_node($1);
+    $$ = create_node_token($1);
     add_child($$, $3);
     add_child($$, $5);
 }
 | TK_PR_IF '(' expression ')' command_block TK_PR_ELSE command_block 
 {
-    $$ = create_node($1);
+    $$ = create_node_token($1);
     add_child($$, $3);
     add_child($$, $5);
     add_child($$, $7);
 }
 | TK_PR_WHILE '(' expression ')' command_block
 {
-    $$ = create_node($1);
+    $$ = create_node_token($1);
     add_child($$, $3);
     add_child($$, $5);
 };
@@ -264,7 +264,7 @@ expression: expression7
 // Grau 7 de precedencia das expressões. Pode ser um OR ou uma expressão mais prioritária.
 expression7: expression7 TK_OC_OR expression6 
 {
-    $$ = create_node($2);
+    $$ = create_node_token($2);
     add_child($$, $1);
     add_child($$, $3);
 }
@@ -275,7 +275,7 @@ expression7: expression7 TK_OC_OR expression6
 // Grau 6 de precedencia. Pode ser um AND ou uma expressão mais prioritária.
 expression6: expression6 TK_OC_AND expression5 
 {
-    $$ = create_node($2);
+    $$ = create_node_token($2);
     add_child($$, $1);
     add_child($$, $3);
 }
@@ -286,13 +286,13 @@ expression6: expression6 TK_OC_AND expression5
 // Grau 5 de precedencia. Pode ser um EQUAL ou um NOT EQUAL ou uma expressão mais prioritária.
 expression5: expression5 TK_OC_EQ expression4 
 {
-    $$ = create_node($2);
+    $$ = create_node_token($2);
     add_child($$, $1);
     add_child($$, $3);
 }
 | expression5 TK_OC_NE expression4 
 {
-    $$ = create_node($2);
+    $$ = create_node_token($2);
     add_child($$, $1);
     add_child($$, $3);
 }
@@ -303,25 +303,25 @@ expression5: expression5 TK_OC_EQ expression4
 // Grau 4 de precedencia. Pode ser um < ou um > ou um LessEqual ou um GreaterEqual ou uma expressão mais prioritária.
 expression4: expression4 TK_OC_LE expression3 
 {
-    $$ = create_node($2);
+    $$ = create_node_token($2);
     add_child($$, $1);
     add_child($$, $3);
 }
 | expression4 TK_OC_GE expression3 
 {
-    $$ = create_node($2);
+    $$ = create_node_token($2);
     add_child($$, $1);
     add_child($$, $3);
 }
 | expression4 '<' expression3 
 {
-    $$ = create_node($2);
+    $$ = create_node_token($2);
     add_child($$, $1);
     add_child($$, $3);
 }
 | expression4 '>' expression3 
 {
-    $$ = create_node($2);
+    $$ = create_node_token($2);
     add_child($$, $1);
     add_child($$, $3);
 }
@@ -332,13 +332,13 @@ expression4: expression4 TK_OC_LE expression3
 // Grau 3 de precedencia. Pode ser uma adição ou uma subtração ou uma expressão mais prioritária.
 expression3: expression3 '+' expression2 
 {
-    $$ = create_node($2);
+    $$ = create_node_token($2);
     add_child($$, $1);
     add_child($$, $3);
 }
 | expression3 '-' expression2 
 {
-    $$ = create_node($2);
+    $$ = create_node_token($2);
     add_child($$, $1);
     add_child($$, $3);
 }
@@ -349,19 +349,19 @@ expression3: expression3 '+' expression2
 // Grau 2 de precedencia. Pode ser uma * ou / ou % ou uma expressão mais prioritária.
 expression2: expression2 '*' expression1 
 {
-    $$ = create_node($2);
+    $$ = create_node_token($2);
     add_child($$, $1);
     add_child($$, $3);
 }
 | expression2 '/' expression1 
 {
-    $$ = create_node($2);
+    $$ = create_node_token($2);
     add_child($$, $1);
     add_child($$, $3);
 }
 | expression2 '%' expression1 
 {
-    $$ = create_node($2);
+    $$ = create_node_token($2);
     add_child($$, $1);
     add_child($$, $3);
 }
@@ -387,21 +387,21 @@ expression1: negation_expression expression0
 
 negation_expression: negation_expression '!' 
 {
-    $$ = create_node($2);
-    add_child($2, $1);
+    $$ = create_node_token($2);
+    add_child($$, $1);
 }
 | '!'
 {
-    $$ = create_node($1);
+    $$ = create_node_token($1);
 };
 minus_expressison: minus_expressison '-' 
 {
-    $$ = create_node($2);
-    add_child($2, $1);
+    $$ = create_node_token($2);
+    add_child($$, $1);
 }
 | '-' 
 {
-    $$ = create_node($1);
+    $$ = create_node_token($1);
 };
 
 expression0: operands 
@@ -411,12 +411,10 @@ expression0: operands
 | '(' expression ')'
 {
     $$ = $2;
-    freeValor_lexico($1);
-    freeValor_lexico($3);
 };
 operands: TK_IDENTIFICADOR 
 {
-    $$ = create_node($1);
+    $$ = create_node_valor_lexico($1);
 }
 | literal 
 {
@@ -431,35 +429,32 @@ operands: TK_IDENTIFICADOR
 type: TK_PR_INT
 {
     $$ = NULL;
-    freeValor_lexico($1);
 } 
 | TK_PR_FLOAT 
 {
     $$ = NULL;
-    freeValor_lexico($1);
 }
 | TK_PR_BOOL
 {
     $$ = NULL;
-    freeValor_lexico($1);
 };
 
 // -- Literais --
 literal: TK_LIT_INT
 {
-    $$ = create_node($1);
+    $$ = create_node_valor_lexico($1);
 } 
 | TK_LIT_FLOAT 
 {
-    $$ = create_node($1);
+    $$ = create_node_valor_lexico($1);
 }
 | TK_LIT_TRUE 
 {
-    $$ = create_node($1);
+    $$ = create_node_valor_lexico($1);
 }
 | TK_LIT_FALSE
 {
-    $$ = create_node($1);
+    $$ = create_node_valor_lexico($1);
 };
 %%
 

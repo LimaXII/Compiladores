@@ -27,17 +27,17 @@ whitespace [ \t\n\r]
 "bool" { return TK_PR_BOOL; }
 "true" { yylval.valor_lexico = createValor_lexico(yytext, LITERAL, yylineno); return TK_LIT_TRUE; }
 "false" { yylval.valor_lexico = createValor_lexico(yytext, LITERAL, yylineno); return TK_LIT_FALSE; }
-"if" { yylval.ast_token_val = strndup(yytext, 2); return TK_PR_IF; }
+"if" { yylval.ast_token = strndup(yytext, 2); return TK_PR_IF; }
 "else" { return TK_PR_ELSE; }
-"while" { yylval.ast_token_val = strndup(yytext, 5); return TK_PR_WHILE; }
-"return" { yylval.ast_token_val = strndup(yytext, 6); return TK_PR_RETURN; }
-"<=" { yylval.ast_token_val = strndup(yytext, 2); return TK_OC_LE; }
-">=" { yylval.ast_token_val = strndup(yytext, 2); return TK_OC_GE; }
-"==" { yylval.ast_token_val = strndup(yytext, 2); return TK_OC_EQ; }
-"!=" { yylval.ast_token_val = strndup(yytext, 2); return TK_OC_NE; }
-"&" { yylval.ast_token_val = strndup(yytext, 1); return TK_OC_AND; }
-"|" { yylval.ast_token_val = strndup(yytext, 1); return TK_OC_OR; }
-{special_char}  { yylval.ast_token_val = strndup(yytext, 1); return yytext[0]; }
+"while" { yylval.ast_token = strndup(yytext, 5); return TK_PR_WHILE; }
+"return" { yylval.ast_token = strndup(yytext, 6); return TK_PR_RETURN; }
+"<=" { yylval.ast_token = strndup(yytext, 2); return TK_OC_LE; }
+">=" { yylval.ast_token = strndup(yytext, 2); return TK_OC_GE; }
+"==" { yylval.ast_token = strndup(yytext, 2); return TK_OC_EQ; }
+"!=" { yylval.ast_token = strndup(yytext, 2); return TK_OC_NE; }
+"&" { yylval.ast_token = strndup(yytext, 1); return TK_OC_AND; }
+"|" { yylval.ast_token = strndup(yytext, 1); return TK_OC_OR; }
+
 
 [a-z_]+[a-z_0-9]* { yylval.valor_lexico = createValor_lexico(yytext, IDENTIFIER, yylineno); return TK_IDENTIFICADOR; } 
 [0-9]+ { yylval.valor_lexico = createValor_lexico(yytext, LITERAL, yylineno); return TK_LIT_INT; }
@@ -54,7 +54,7 @@ whitespace [ \t\n\r]
 <comment>"*"+"/"        { BEGIN(INITIAL); }
 
 {whitespace} { }
-{special_char}  {return yytext[0];}
+{special_char}  { yylval.ast_token = strndup(yytext, 1); return yytext[0]; }
 
 . {return TK_ERRO;}
 %%

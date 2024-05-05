@@ -7,7 +7,7 @@
 #include "ast_tree.h"
 
 // Função para criar um novo nodo.
-Node* create_node(Valor_lexico valor_lexico) {
+Node* create_node_valor_lexico(Valor_lexico valor_lexico) {
     // Aloca memória do tamanho de um nodo.
     Node* new_node = (Node*)malloc(sizeof(Node));       
     if (new_node == NULL) {
@@ -22,8 +22,8 @@ Node* create_node(Valor_lexico valor_lexico) {
     return new_node;
 }
 
-Node* create_node_to_function(Valor_lexico valor_lexico) {
-    Node* node = createNode(valor_lexico);
+Node* create_node_function(Valor_lexico valor_lexico) {
+    Node* node = create_node_valor_lexico(valor_lexico);
 
     char* start = "call ";
     char* newtoken_val = malloc(strlen(start) + strlen(node->valor_lexico.token_val) + 1);
@@ -35,6 +35,24 @@ Node* create_node_to_function(Valor_lexico valor_lexico) {
     node->valor_lexico.token_val = newtoken_val;
 
     return node;
+}
+
+Node* create_node_token(char* token){
+    Node* new_node = (Node*)malloc(sizeof(Node));       
+    if (new_node == NULL) {
+        fprintf(stderr, "Erro ao alocar memória para um novo nó.\n");
+        exit(1);
+    }
+
+    // Atribui os valores do nodo. Depois retorna o novo nodo criado.
+    new_node->valor_lexico.token_val = token;
+    new_node->valor_lexico.line_number = -1;
+    new_node->valor_lexico.type = OTHER;
+
+    new_node->children = NULL;
+    new_node->daddy = NULL;
+    new_node->child_count = 0;
+    return new_node;
 }
 
 // Função para adicionar um nodo a um nó.
@@ -88,30 +106,4 @@ void exporta(Node* node) {
     // 2. 0x8235900, 0x82358e8.
     print_tree_token_vals(node);
     print_tree_hierarchy(node);
-}
-
-// Exemplo de uso das funções
-int main() {
-    Valor_lexico val1 = {1, IDENTIFIER, "root"};
-    Valor_lexico val2 = {2, LITERAL, "child1"};
-    Valor_lexico val3 = {3, IDENTIFIER, "child2"};
-    Valor_lexico val4 = {4, IDENTIFIER, "child3"};
-    Valor_lexico val5 = {5, IDENTIFIER, "child4"};
-
-    Node* root = create_node(val1);
-    Node* child1 = create_node(val2);
-    Node* child2 = create_node(val3);
-    Node* child3 = create_node(val4);
-    Node* child4 = create_node(val5);
-
-    add_child(root, child1);
-    add_child(root, child2);
-    add_child(child1, child3);
-    add_child(child1, child4);
-
-    print_tree_token_vals(root);
-    print_tree_hierarchy(root);
-    free_tree(root);
-
-    return 0;
 }

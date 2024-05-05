@@ -15,8 +15,9 @@ typedef struct Node {
 } Node;
 
 // Declarações das funções para manipulação da árvore
-Node* create_node(Valor_lexico valor_lexico);
-Node* create_node_to_function(Valor_lexico valor_lexico);
+Node* create_node_valor_lexico(Valor_lexico valor_lexico);
+Node* create_node_function(Valor_lexico valor_lexico);
+Node* create_node_token(char* token);
 void add_child(Node* parent, Node* child);  // Adiciona um filho a arvore.
 void print_tree_labels(Node* node);         // Printa endereço e label, no formato: 0x8235900 [label="minha_funcao"];
 void print_tree_hierarchy(Node* node);      // Printa hierarquia, no formato: 0x8235900, 0x82358e8.
