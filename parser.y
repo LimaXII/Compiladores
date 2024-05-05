@@ -94,7 +94,9 @@ program: elements_list
 elements_list: elements_list element 
 {
     $$ = $2;
-    add_child($$, $1);
+    if ($2 && $1){
+        add_child($$, $1);
+    }
 }
 | element
 {
@@ -129,7 +131,9 @@ ident_list: ident_list ';' TK_IDENTIFICADOR
 function: header body
 {
     $$ = $1;
-    add_child($$, $2);
+    if ($2){
+        add_child($$, $2);
+    }
 };
 // Cabeçalho da função. Podendo conter uma lista de parametros ou nenhum parametro.
 header: '(' parameters_list ')' TK_OC_OR type '/' TK_IDENTIFICADOR 
@@ -167,7 +171,7 @@ command_block: '{' simple_command_list '}'
 };
 simple_command_list: simple_command_list command 
 {
-    if ($2)
+    if ($2 && $1)
     {
         $$ = $2;
         add_child($$, $1);
@@ -231,20 +235,28 @@ control_command: TK_PR_IF '(' expression ')' command_block
 {
     $$ = create_node_token($1);
     add_child($$, $3);
-    add_child($$, $5);
+    if ($5){
+        add_child($$, $5);
+    }
 }
 | TK_PR_IF '(' expression ')' command_block TK_PR_ELSE command_block 
 {
     $$ = create_node_token($1);
     add_child($$, $3);
-    add_child($$, $5);
-    add_child($$, $7);
+    if ($5){
+        add_child($$, $5);
+    }
+    if ($7){
+        add_child($$, $7);
+    }
 }
 | TK_PR_WHILE '(' expression ')' command_block
 {
     $$ = create_node_token($1);
     add_child($$, $3);
-    add_child($$, $5);
+    if ($5){
+        add_child($$, $5);
+    }
 };
 arguments: arguments ';' expression 
 {

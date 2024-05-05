@@ -1,43 +1,4 @@
-# Executado assim: /bin/bash output.txt
+# Executado assim: ./run.sh output.txt
 # https://graphviz.org/doc/info/lang.html
 digraph {
-  x5604d36673d0 [label="funcaoteste"];
-  x5604d3667c00 [label="if"];
-  x5604d3667960 [label="true"];
-  x5604d3667b40 [label="="];
-  x5604d3667b70 [label="num"];
-  x5604d3667ad0 [label="*"];
-  x5604d3667a30 [label="20"];
-  x5604d3667aa0 [label="30"];
-  x5604d3667880 [label="="];
-  x5604d36678b0 [label="num"];
-  x5604d3667830 [label="+"];
-  x5604d3667750 [label="*"];
-  x5604d36675d0 [label="num"];
-  x5604d3667700 [label="-"];
-  x5604d3667640 [label="20"];
-  x5604d36676b0 [label="30"];
-  x5604d36677e0 [label="40"];
-  x5604d36674d0 [label="="];
-  x5604d3667500 [label="num"];
-  x5604d3667480 [label="10"];
-  x5604d36673d0 -> x5604d3667c00
-  x5604d3667c00 -> x5604d3667960
-  x5604d3667c00 -> x5604d3667b40
-  x5604d3667b40 -> x5604d3667b70
-  x5604d3667b40 -> x5604d3667ad0
-  x5604d3667ad0 -> x5604d3667a30
-  x5604d3667ad0 -> x5604d3667aa0
-  x5604d3667c00 -> x5604d3667880
-  x5604d3667880 -> x5604d36678b0
-  x5604d3667880 -> x5604d3667830
-  x5604d3667830 -> x5604d3667750
-  x5604d3667750 -> x5604d36675d0
-  x5604d3667750 -> x5604d3667700
-  x5604d3667700 -> x5604d3667640
-  x5604d3667700 -> x5604d36676b0
-  x5604d3667830 -> x5604d36677e0
-  x5604d3667880 -> x5604d36674d0
-  x5604d36674d0 -> x5604d3667500
-  x5604d36674d0 -> x5604d3667480
 }
