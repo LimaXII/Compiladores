@@ -22,14 +22,14 @@ extern void* arvore;
 
 %define parse.error verbose
 
-%token TK_PR_INT
-%token TK_PR_FLOAT
-%token TK_PR_BOOL
+%token <valor_lexico>TK_PR_INT
+%token <valor_lexico>TK_PR_FLOAT
+%token <valor_lexico>TK_PR_BOOL
 %token<ast_token_val> TK_PR_IF
 %token TK_PR_ELSE
 %token<ast_token_val> TK_PR_WHILE
 %token<ast_token_val> TK_PR_RETURN
-%token<ast_token_val> TK_OC_LE
+%token<valor_lexico> TK_OC_LE
 %token<ast_token_val> TK_OC_GE
 %token<ast_token_val> TK_OC_EQ
 %token<ast_token_val> TK_OC_NE
@@ -40,6 +40,8 @@ extern void* arvore;
 %token<valor_lexico> TK_LIT_FLOAT
 %token<valor_lexico> TK_LIT_FALSE
 %token<valor_lexico> TK_LIT_TRUE
+%token<valor_lexico> '=' '<' '>' '+' '-' '*' '/' '%' '!' '(' ')'
+
 %token TK_ERRO
 
 %type<node> program
@@ -48,6 +50,8 @@ extern void* arvore;
 %type<node> global_vars_declaration
 %type<node> function
 %type<node> type
+%type<node> operands
+%type<node> literal
 %type<node> ident_list
 %type<node> header
 %type<node> body
@@ -70,6 +74,8 @@ extern void* arvore;
 %type<node> expression5
 %type<node> expression6
 %type<node> expression7
+%type<node> minus_expressison
+%type<node> negation_expression
 
 %%
 
@@ -164,7 +170,7 @@ simple_command_list: simple_command_list command
     if ($2)
     {
         $$ = $2;
-        addChild($$, $1);
+        add_child($$, $1);
     }
     else
     {
@@ -173,8 +179,8 @@ simple_command_list: simple_command_list command
 }
 | command
 {
-    $$ = $1
-};
+    $$ = $1;
+}
 
 // -- Comandos Simples --
 command: command_block ',' 
@@ -204,7 +210,7 @@ command: command_block ','
 attribution_command: TK_IDENTIFICADOR '=' expression
 {
     $$ = create_node($2);
-    add_child($$, createNode($1));
+    add_child($$, create_node($1));
     add_child($$, $3);
 };
 function_call: TK_IDENTIFICADOR '(' arguments ')'

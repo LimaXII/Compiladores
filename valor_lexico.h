@@ -5,6 +5,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+#ifndef VALOR_LEXICO_H
+#define VALOR_LEXICO_H
+
 // Define o TokenType enum. Ele pode ser um identificador ou um Literal.
 typedef enum TokenType
 {
@@ -23,3 +26,5 @@ typedef struct Valor_lexico
 // Funções implementadas.
 Valor_lexico createValor_lexico(char* token_val, TokenType type, int line_number);
 void freeValor_lexico(Valor_lexico valor_lexico);
+
+#endif // VALOR_LEXICO_H
