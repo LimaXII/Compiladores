@@ -57,6 +57,8 @@ Node* create_node_token(char* token){
 
 // Função para adicionar um nodo a um nó.
 void add_child(Node* parent, Node* child) {
+    if (!child) return;
+    
     parent->child_count++;         // Incrementa o número de filhos.
     parent->children = (Node**)realloc(parent->children, parent->child_count * sizeof(Node*));
     if (parent->children == NULL) {

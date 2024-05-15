@@ -1,11 +1,161 @@
 # Executado assim: ./run.sh output.txt
 # https://graphviz.org/doc/info/lang.html
 digraph {
-  x5564c6189740 [label="fd"];
-  x5564c6189610 [label="fc"];
-  x5564c61894e0 [label="fb"];
-  x5564c61893d0 [label="fa"];
-  x5564c6189740 -> x5564c6189610
-  x5564c6189610 -> x5564c61894e0
-  x5564c61894e0 -> x5564c61893d0
+  x5646619ff450 [label="abc"];
+  x5646619ff610 [label="="];
+  x5646619ff640 [label="abc"];
+  x5646619ff5c0 [label="+"];
+  x5646619ff500 [label="123"];
+  x5646619ff590 [label="banana"];
+  x564661a000f0 [label="if"];
+  x5646619ff6f0 [label="!"];
+  x5646619ff740 [label="123"];
+  x5646619ff8f0 [label="="];
+  x5646619ff920 [label="abc"];
+  x5646619ff830 [label="-"];
+  x5646619ff880 [label="123"];
+  x5646619ffb90 [label="="];
+  x5646619ffbc0 [label="cdb"];
+  x5646619ffb20 [label="call func"];
+  x5646619ffad0 [label=">"];
+  x5646619ffa30 [label="p"];
+  x5646619ffa80 [label="2"];
+  x564661a00050 [label="="];
+  x564661a00080 [label="papa"];
+  x5646619fffe0 [label="call pedro"];
+  x5646619fff70 [label="call jean"];
+  x5646619fff20 [label="+"];
+  x5646619ffd50 [label="robert"];
+  x5646619ffed0 [label="%"];
+  x5646619ffda0 [label="453"];
+  x5646619ffe10 [label="!"];
+  x5646619ffe80 [label="vinho"];
+  x564661a001c0 [label="call func"];
+  x564661a006b0 [label="while"];
+  x564661a002c0 [label="!"];
+  x564661a00270 [label="!"];
+  x564661a00600 [label="call func"];
+  x564661a00370 [label="123"];
+  x564661a003e0 [label="231"];
+  x564661a00550 [label="call pedro"];
+  x564661a00490 [label="-"];
+  x564661a00500 [label="abc"];
+  x564661a00890 [label="="];
+  x564661a008c0 [label="fyj"];
+  x564661a00840 [label="+"];
+  x564661a007a0 [label="fcc"];
+  x564661a00810 [label="abc"];
+  x564661a00a60 [label="return"];
+  x564661a00a10 [label=">"];
+  x564661a00970 [label="b"];
+  x564661a009c0 [label="3"];
+  x564661a00bc0 [label="second_func"];
+  x564661a00cc0 [label="="];
+  x564661a00cf0 [label="schnorr"];
+  x564661a00c90 [label="maluco"];
+  x564661a012b0 [label="if"];
+  x564661a00e60 [label="+"];
+  x564661a00dc0 [label="alagado"];
+  x564661a00e30 [label="chuva"];
+  x564661a01150 [label="call desligar"];
+  x564661a00f50 [label="tv"];
+  x564661a00fc0 [label="roteador"];
+  x564661a010a0 [label="call pc"];
+  x564661a01070 [label="filhos"];
+  x564661a01220 [label="call funcao"];
+  x564661a014f0 [label="while"];
+  x564661a01460 [label=">"];
+  x564661a01380 [label="fyj"];
+  x564661a01410 [label="call tupla"];
+  x564661a019c0 [label="while"];
+  x564661a01730 [label="=="];
+  x564661a015e0 [label="fyj"];
+  x564661a01630 [label="!"];
+  x564661a016c0 [label="call teste"];
+  x564661a01800 [label="call loop"];
+  x564661a01900 [label="="];
+  x564661a01930 [label="abc"];
+  x564661a018b0 [label="123"];
+  x564661a01cc0 [label="if"];
+  x564661a01ab0 [label="abc"];
+  x564661a01b60 [label="call deu"];
+  x564661a01c50 [label="call nao_deu"];
+  x5646619ff450 -> x5646619ff610
+  x5646619ff610 -> x5646619ff640
+  x5646619ff610 -> x5646619ff5c0
+  x5646619ff5c0 -> x5646619ff500
+  x5646619ff5c0 -> x5646619ff590
+  x5646619ff610 -> x564661a000f0
+  x564661a000f0 -> x5646619ff6f0
+  x5646619ff6f0 -> x5646619ff740
+  x564661a000f0 -> x5646619ff8f0
+  x5646619ff8f0 -> x5646619ff920
+  x5646619ff8f0 -> x5646619ff830
+  x5646619ff830 -> x5646619ff880
+  x5646619ff8f0 -> x5646619ffb90
+  x5646619ffb90 -> x5646619ffbc0
+  x5646619ffb90 -> x5646619ffb20
+  x5646619ffb20 -> x5646619ffad0
+  x5646619ffad0 -> x5646619ffa30
+  x5646619ffad0 -> x5646619ffa80
+  x564661a000f0 -> x564661a00050
+  x564661a00050 -> x564661a00080
+  x564661a00050 -> x5646619fffe0
+  x5646619fffe0 -> x5646619fff70
+  x5646619fff70 -> x5646619fff20
+  x5646619fff20 -> x5646619ffd50
+  x5646619fff20 -> x5646619ffed0
+  x5646619ffed0 -> x5646619ffda0
+  x5646619ffed0 -> x5646619ffe10
+  x5646619ffe10 -> x5646619ffe80
+  x564661a000f0 -> x564661a001c0
+  x564661a001c0 -> x564661a006b0
+  x564661a006b0 -> x564661a002c0
+  x564661a002c0 -> x564661a00270
+  x564661a002c0 -> x564661a00600
+  x564661a00600 -> x564661a00370
+  x564661a00370 -> x564661a003e0
+  x564661a003e0 -> x564661a00550
+  x564661a00550 -> x564661a00490
+  x564661a00490 -> x564661a00500
+  x564661a006b0 -> x564661a00890
+  x564661a00890 -> x564661a008c0
+  x564661a00890 -> x564661a00840
+  x564661a00840 -> x564661a007a0
+  x564661a00840 -> x564661a00810
+  x564661a00890 -> x564661a00a60
+  x564661a00a60 -> x564661a00a10
+  x564661a00a10 -> x564661a00970
+  x564661a00a10 -> x564661a009c0
+  x5646619ff450 -> x564661a00bc0
+  x564661a00bc0 -> x564661a00cc0
+  x564661a00cc0 -> x564661a00cf0
+  x564661a00cc0 -> x564661a00c90
+  x564661a00cc0 -> x564661a012b0
+  x564661a012b0 -> x564661a00e60
+  x564661a00e60 -> x564661a00dc0
+  x564661a00e60 -> x564661a00e30
+  x564661a012b0 -> x564661a01150
+  x564661a01150 -> x564661a00f50
+  x564661a00f50 -> x564661a00fc0
+  x564661a00fc0 -> x564661a010a0
+  x564661a010a0 -> x564661a01070
+  x564661a01150 -> x564661a01220
+  x564661a012b0 -> x564661a014f0
+  x564661a014f0 -> x564661a01460
+  x564661a01460 -> x564661a01380
+  x564661a01460 -> x564661a01410
+  x564661a014f0 -> x564661a019c0
+  x564661a019c0 -> x564661a01730
+  x564661a01730 -> x564661a015e0
+  x564661a01730 -> x564661a01630
+  x564661a01630 -> x564661a016c0
+  x564661a019c0 -> x564661a01800
+  x564661a01800 -> x564661a01900
+  x564661a01900 -> x564661a01930
+  x564661a01900 -> x564661a018b0
+  x564661a019c0 -> x564661a01cc0
+  x564661a01cc0 -> x564661a01ab0
+  x564661a01cc0 -> x564661a01b60
+  x564661a01cc0 -> x564661a01c50
 }

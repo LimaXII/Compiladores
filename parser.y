@@ -91,11 +91,14 @@ program: elements_list
     arvore = NULL;
 }; // Contendo uma lista de elementos ou vazio.
 
-elements_list: elements_list element 
+elements_list: element elements_list
 {
-    $$ = $2;
-    if ($2 && $1){
-        add_child($$, $1);
+    if ($1){
+        $$ = $1;
+        add_child($$, $2);
+    }
+    else{
+        $$ = $2;
     }
 }
 | element
@@ -116,10 +119,10 @@ global_vars_declaration: type ident_list ','
 {
     $$ = NULL;
 }
-ident_list: ident_list ';' TK_IDENTIFICADOR 
+ident_list: TK_IDENTIFICADOR ';' ident_list
 {
     $$ = NULL;
-    freeValor_lexico($3);
+    freeValor_lexico($1);
 }
 | TK_IDENTIFICADOR
 {
@@ -144,7 +147,7 @@ header: '(' parameters_list ')' TK_OC_OR type '/' TK_IDENTIFICADOR
 {
     $$ = create_node_valor_lexico($6);
 };
-parameters_list: parameters_list ';' parameter 
+parameters_list: parameter ';' parameters_list
 {
     $$ = NULL;
 }
@@ -169,16 +172,16 @@ command_block: '{' simple_command_list '}'
 {
     $$ = NULL;
 };
-simple_command_list: simple_command_list command 
+simple_command_list: command simple_command_list
 {
-    if ($2 && $1)
+    if ($1)
     {
-        $$ = $2;
-        add_child($$, $1);
+        $$ = $1;
+        add_child($$, $2);
     }
     else
     {
-        $$ = $1;
+        $$ = $2;
     }
 }
 | command
@@ -258,10 +261,10 @@ control_command: TK_PR_IF '(' expression ')' command_block
         add_child($$, $5);
     }
 };
-arguments: arguments ';' expression 
+arguments: expression ';' arguments
 {
-    $$ = $3;
-    add_child($$, $1);
+    $$ = $1;
+    add_child($$, $3);
 }
 | expression
 {
