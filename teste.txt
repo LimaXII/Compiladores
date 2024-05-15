@@ -1,19 +1,6 @@
-int n,
-() | bool / funcaoteste
+int va,
+(float k; int l)|int/fa
 {
-    num = 10,
-    num = num * (20 - 30) + 40,
-    while (true){
-        x = 310,
-        float h,
-    },
-    if (false){
-        b = a + 2,
-    }
-    else{
-        c = c/2,
-    },
-    // okasdopkaskopdasd
-    // n = x + 4
-    bool verdade,
+  int a,
 }
+int vc,
