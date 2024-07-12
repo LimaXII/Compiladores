@@ -1,0 +1,5 @@
+# Executado assim: ./run.sh output.txt
+# https://graphviz.org/doc/info/lang.html
+digraph {
+  x55d1df88a410 [label="fa"];
+}

@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "stdlib.h": "c",
+        "valor_lexico.h": "c",
+        "ast_tree.h": "c"
+    }
+}
