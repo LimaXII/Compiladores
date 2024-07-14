@@ -28,17 +28,16 @@ typedef enum SymbolNature
     SYMBOL_NATURE_NON_EXISTENT
 } SymbolNature;
 
-//Valores associados a um símbolo na tabela
+//Conteúdo de uma entrada na tabela
 typedef struct TableEntryValue
 {
-    int lineNumber;
+    int line_number;
     SymbolNature symbol_nature;
-    DataType dataType;
+    DataType data_type;
     Valor_lexico valor_lexico;
 } TableEntryValue;
 
-//Uma entrada numa tabela de símbolos
-//Lista encadeada
+//Entrada na tabela de símbolos
 typedef struct TableEntry
 {
     char* key;
@@ -66,51 +65,51 @@ typedef struct Table
 //Um elemento da pilha de tabelas de símbolos
 typedef struct TableStack
 {
-    Table* Table;
+    Table* table;
     struct TableStack* nextItem;    
 } TableStack;
 
 extern TableStack* globalTableStack;
 
-void initGlobalSymbolStack();
+void init_global_symbol_stack();
 
-void addTableToGlobalStack(Table* Table);
+void add_table_to_global_stack(Table* table);
 
-void popGlobalStack();
+void pop_global_stack();
 
-void copySymbolsToGlobalStackBelow();
+void copy_symbols_to_global_stack_below();
 
 //Criação de uma nova pilha de tabela de símbolos
-TableStack* createTableStack();
+TableStack* create_table_stack();
 
 //Criação de uma nova tabela de símbolos
-Table* createTable();
+Table* create_table();
 
 //Criação de um valor de símbolo para a tabela de símbolos
-TableEntryValue createTableEntryValue(SymbolNature symbol_nature, DataType data_type, Valor_lexico valor_lexico);
+TableEntryValue create_table_entry_value(SymbolNature symbol_nature, DataType data_type, Valor_lexico valor_lexico);
 
 //Operações de liberação de memória
-void freeTableEntryValue(TableEntryValue value);
-void freeTable(Table* table);
-void freeTableStack(TableStack* stack);
+void free_table_entry_value(TableEntryValue value);
+void free_table(Table* table);
+void free_table_stack(TableStack* stack);
 
 //////////////////////////////////////////////////////////////
 //          OPERAÇÕES COM CHAVES E VALORES
 //////////////////////////////////////////////////////////////
 
 // Retorna uma entrada vazia
-TableEntryValue getEmptyTableEntryValue();
+TableEntryValue get_empty_table_entry_value();
 
 // Checa se há um valor associado a uma chave numa tabela
-TableEntryValue getTableEntryValueByKey(Table* table, char* key);
+TableEntryValue get_table_value_by_key(Table* table, char* key);
 
 // Percorre as tabelas da pilha por um valor associado à chave
-TableEntryValue getSymbolFromStackByKey(char* key);
+TableEntryValue get_symbol_from_stack_by_key(char* key);
 
 // djba2 hash function
-size_t getIndex(size_t capacity, char* key);
+size_t get_index(size_t capacity, char* key);
 
-int isSameKey(TableEntry* entry, char* key);
+int is_same_key(TableEntry* entry, char* key);
 
 
 //////////////////////////////////////////////////////////////
@@ -118,28 +117,28 @@ int isSameKey(TableEntry* entry, char* key);
 //////////////////////////////////////////////////////////////
 
 // Adiciona um símbolo a uma tabela de símbolos
-void addSymbolValueToTable(Table* table, TableEntryValue value);
-void addSymbolValueToGlobalTableStack(TableEntryValue value);
-void addSymbolValueToBelowGlobalTableStack(TableEntryValue value);
+void add_symbol_value_to_table(Table* table, TableEntryValue value);
+void add_symbol_value_to_global_table_stack(TableEntryValue value);
+void add_symbol_value_to_below_global_table_stack(TableEntryValue value);
 
 // Verifica se a chave já existe em uma tabela dada
-int isKeyInTable(Table* table, char* key);
+int is_key_in_table(Table* table, char* key);
 
 // Verifica se o símbolo já foi declarado nas tabelas da pilhas
 // (percorre do topo ao fim da pilha)
-void checkSymbolDeclared(TableEntryValue value);
+void check_symbol_declared(TableEntryValue value);
 
 // Verifica se o identificador já foi declarado nas tabelas da pilhas
 // (percorre do topo ao fim da pilha)
-int isIdentifierDeclared(char* identifier);
+int is_identifier_declared(char* identifier);
 
 /////////////////////////////////////////////////////////////
 //          UTILS
 //////////////////////////////////////////////////////////////
 
-void printGlobalTableStack(int depth);
-DataType inferTypeFromIdentifier(Valor_lexico identifier);
-void checkIdentifierIsVariable(Valor_lexico identifier);
-void checkIdentifierIsFunction(Valor_lexico identifier);
+void print_global_table_stack(int depth);
+DataType infer_type_from_identifier(Valor_lexico identifier);
+void check_identifier_is_variable(Valor_lexico identifier);
+void check_identifier_is_function(Valor_lexico identifier);
 
 #endif
