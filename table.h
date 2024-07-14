@@ -22,8 +22,8 @@ DataType infer_type_from_types(DataType first_type, DataType second_type);
 //Natureza de um símbolo
 typedef enum SymbolNature
 {
-    SYMBOL_NATURE_LITERAL,
     SYMBOL_NATURE_IDENTIFIER,
+    SYMBOL_NATURE_LITERAL,
     SYMBOL_NATURE_FUNCTION,
     SYMBOL_NATURE_NON_EXISTENT
 } SymbolNature;
@@ -32,7 +32,7 @@ typedef enum SymbolNature
 typedef struct TableEntryValue
 {
     int lineNumber;
-    SymbolNature symbolNature;
+    SymbolNature symbol_nature;
     DataType dataType;
     Valor_lexico valor_lexico;
 } TableEntryValue;
@@ -87,7 +87,7 @@ TableStack* createTableStack();
 Table* createTable();
 
 //Criação de um valor de símbolo para a tabela de símbolos
-TableEntryValue createTableEntryValue(SymbolNature symbolNature, DataType dataType, Valor_lexico Valor_lexico);
+TableEntryValue createTableEntryValue(SymbolNature symbol_nature, DataType data_type, Valor_lexico valor_lexico);
 
 //Operações de liberação de memória
 void freeTableEntryValue(TableEntryValue value);
