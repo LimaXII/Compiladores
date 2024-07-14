@@ -10,6 +10,7 @@
 // Definição da estrutura Node
 typedef struct Node {
     Valor_lexico valor_lexico;              // Valor do nodo.
+    DataType data_type;
     struct Node** children;                 // Ponteiro de ponteiro para o nodo filho.
     struct Node* daddy;                     // Ponteiro para o nodo pai.
     int child_count;                        // Para contar quantos filhos tem.

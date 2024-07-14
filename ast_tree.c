@@ -111,11 +111,11 @@ void exporta(Node* node) {
 }
 
 DataType infer_type_from_node(Node* node){
-    return node->dataType;
+    return node->data_type;
 }
 
 DataType infer_type_from_nodes(Node* node1, Node* node2){
-    DataType inferred_type = infer_type_from_types(node1->dataType, node2->dataType);
+    DataType inferred_type = infer_type_from_types(node1->data_type, node2->data_type);
 
     return inferred_type;
 }
