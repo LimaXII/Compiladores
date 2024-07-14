@@ -6,18 +6,26 @@
 #include <stdio.h>
 #include "valor_lexico.h"
 #include "ast_tree.h"
+#include "table.h"
 
 // Importa as funções necessárias.
 int get_line_number();
 int yylex(void);
 void yyerror (char const *message);
-extern void* arvore;
+extern Node* arvore;
+extern SymbolTableStack* globalSymbolTableStack;
+
+DataType declared_type = DATA_TYPE_UNDECLARED; // O tipo atualmente declarado
+Node* mainFunctionNode = NULL;
+
 %}
 
 %union{
     Valor_lexico valor_lexico;
     struct Node* node;
     char* ast_token;
+    DataType data_type;
+    SymbolNature symbol_nature;
 }
 
 %define parse.error verbose
@@ -476,5 +484,5 @@ literal: TK_LIT_INT
 // Função que imprime na tela o erro encontrado.
 void yyerror(char const *message)
 {
-    printf("Erro encontrado na linha %d: %s\n", get_line_number(), message);
+    printf("Erro Sintático encontrado na linha %d: %s\n", get_line_number(), message);
 }

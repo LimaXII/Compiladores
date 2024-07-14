@@ -109,3 +109,13 @@ void exporta(Node* node) {
     print_tree_token_vals(node);
     print_tree_hierarchy(node);
 }
+
+DataType infer_type_from_node(Node* node){
+    return node->dataType;
+}
+
+DataType infer_type_from_nodes(Node* node1, Node* node2){
+    DataType inferred_type = infer_type_from_types(node1->dataType, node2->dataType);
+
+    return inferred_type;
+}
