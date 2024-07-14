@@ -7,7 +7,7 @@
 #include "ast_tree.h"
 
 // Função para criar um novo nodo.
-Node* create_node_valor_lexico(Valor_lexico valor_lexico) {
+Node* create_node_valor_lexico(Valor_lexico valor_lexico, DataType data_type) {
     // Aloca memória do tamanho de um nodo.
     Node* new_node = (Node*)malloc(sizeof(Node));       
     if (new_node == NULL) {
@@ -18,12 +18,13 @@ Node* create_node_valor_lexico(Valor_lexico valor_lexico) {
     new_node->valor_lexico = valor_lexico;      
     new_node->children = NULL;
     new_node->daddy = NULL;
+    new_node->data_type = data_type;
     new_node->child_count = 0;
     return new_node;
 }
 
-Node* create_node_function(Valor_lexico valor_lexico) {
-    Node* node = create_node_valor_lexico(valor_lexico);
+Node* create_node_function(Valor_lexico valor_lexico, DataType data_type) {
+    Node* node = create_node_valor_lexico(valor_lexico, data_type);
 
     char* start = "call ";
     char* newtoken_val = malloc(strlen(start) + strlen(node->valor_lexico.token_val) + 1);
@@ -37,7 +38,7 @@ Node* create_node_function(Valor_lexico valor_lexico) {
     return node;
 }
 
-Node* create_node_token(char* token){
+Node* create_node_token(char* token, DataType data_type){
     Node* new_node = (Node*)malloc(sizeof(Node));       
     if (new_node == NULL) {
         fprintf(stderr, "Erro ao alocar memória para um novo nó.\n");
@@ -51,6 +52,7 @@ Node* create_node_token(char* token){
 
     new_node->children = NULL;
     new_node->daddy = NULL;
+    new_node->data_type = data_type;
     new_node->child_count = 0;
     return new_node;
 }
