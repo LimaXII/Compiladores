@@ -19,7 +19,7 @@ typedef enum DataType
 
 DataType infer_type_from_types(DataType first_type, DataType second_type);
 
-//Natureza de um símbolo
+// Natureza de um símbolo
 typedef enum SymbolNature
 {
     SYMBOL_NATURE_IDENTIFIER,
@@ -28,7 +28,7 @@ typedef enum SymbolNature
     SYMBOL_NATURE_NON_EXISTENT
 } SymbolNature;
 
-//Conteúdo de uma entrada na tabela
+// Conteúdo de uma entrada na tabela
 typedef struct TableEntryValue
 {
     int line_number;
@@ -37,7 +37,7 @@ typedef struct TableEntryValue
     Valor_lexico valor_lexico;
 } TableEntryValue;
 
-//Entrada na tabela de símbolos
+// Entrada na tabela de símbolos
 typedef struct TableEntry
 {
     char* key;
@@ -50,10 +50,9 @@ typedef struct TableBucket
 {
     int n;
     TableEntry* entries;
- }TableBucket;
+} TableBucket;
 
-
-//Uma tabela de símbolo (um frame da stack)
+// Uma tabela de símbolo (um frame da stack)
 #define N_SYMBOL_TABLE_BUCKETS 32
 
 typedef struct Table
@@ -62,33 +61,30 @@ typedef struct Table
     TableBucket* buckets;
 } Table;
 
-//Um elemento da pilha de tabelas de símbolos
+// Um elemento da pilha de tabelas de símbolos
 typedef struct TableStack
 {
     Table* table;
-    struct TableStack* nextItem;    
+    struct TableStack* next_item;    
 } TableStack;
 
 extern TableStack* globalTableStack;
 
 void init_global_symbol_stack();
-
 void add_table_to_global_stack(Table* table);
-
 void pop_global_stack();
-
 void copy_symbols_to_global_stack_below();
 
-//Criação de uma nova pilha de tabela de símbolos
+// Criação de uma nova pilha de tabela de símbolos
 TableStack* create_table_stack();
 
-//Criação de uma nova tabela de símbolos
+// Criação de uma nova tabela de símbolos
 Table* create_table();
 
-//Criação de um valor de símbolo para a tabela de símbolos
+// Criação de um valor de símbolo para a tabela de símbolos
 TableEntryValue create_table_entry_value(SymbolNature symbol_nature, DataType data_type, Valor_lexico valor_lexico);
 
-//Operações de liberação de memória
+// Operações de liberação de memória
 void free_table_entry_value(TableEntryValue value);
 void free_table(Table* table);
 void free_table_stack(TableStack* stack);
@@ -111,15 +107,14 @@ size_t get_index(size_t capacity, char* key);
 
 int is_same_key(TableEntry* entry, char* key);
 
-
 //////////////////////////////////////////////////////////////
 //          OPERAÇÕES COM A TABELA DE PILHAS
 //////////////////////////////////////////////////////////////
 
 // Adiciona um símbolo a uma tabela de símbolos
-void add_symbol_value_to_table(Table* table, TableEntryValue value);
 void add_symbol_value_to_global_table_stack(TableEntryValue value);
 void add_symbol_value_to_below_global_table_stack(TableEntryValue value);
+void add_symbol_value_to_table(Table* table, TableEntryValue value);
 
 // Verifica se a chave já existe em uma tabela dada
 int is_key_in_table(Table* table, char* key);
@@ -128,15 +123,15 @@ int is_key_in_table(Table* table, char* key);
 // (percorre do topo ao fim da pilha)
 void check_symbol_declared(TableEntryValue value);
 
-// Verifica se o identificador já foi declarado nas tabelas da pilhas
-// (percorre do topo ao fim da pilha)
-int is_identifier_declared(char* identifier);
-
 /////////////////////////////////////////////////////////////
 //          UTILS
 //////////////////////////////////////////////////////////////
 
 void print_global_table_stack(int depth);
+void print_table(Table* table);
+void print_bucket(TableBucket* bucket);
+void print_entry(TableEntry* entry);
+void print_entry_value(TableEntryValue value);
 DataType infer_type_from_identifier(Valor_lexico identifier);
 void check_identifier_is_variable(Valor_lexico identifier);
 void check_identifier_is_function(Valor_lexico identifier);

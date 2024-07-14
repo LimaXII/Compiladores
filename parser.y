@@ -451,33 +451,40 @@ operands: TK_IDENTIFICADOR
 // -- Tipos --
 type: TK_PR_INT
 {
-    $$ = NULL;
+    declared_type = DATA_TYPE_INT;
+    $$ = DATA_TYPE_INT;
 } 
 | TK_PR_FLOAT 
 {
-    $$ = NULL;
+    declared_type = DATA_TYPE_FLOAT;
+    $$ = DATA_TYPE_FLOAT;
 }
 | TK_PR_BOOL
 {
-    $$ = NULL;
+    declared_type = DATA_TYPE_BOOL;
+    $$ = DATA_TYPE_BOOL;
 };
 
 // -- Literais --
 literal: TK_LIT_INT
 {
-    $$ = create_node_valor_lexico($1);
+    $$ = create_node_valor_lexico($1, DATA_TYPE_INT);
 } 
 | TK_LIT_FLOAT 
 {
-    $$ = create_node_valor_lexico($1);
+    $$ = create_node_valor_lexico($1, DATA_TYPE_FLOAT);
 }
 | TK_LIT_TRUE 
 {
-    $$ = create_node_valor_lexico($1);
+    $$ = create_node_valor_lexico($1, DATA_TYPE_BOOL);
+    TableEntryValue value = create_table_entry_value(SYMBOL_NATURE_LITERAL, DATA_TYPE_BOOL, $1);
+    add_symbol_value_to_global_table_stack(value);
 }
 | TK_LIT_FALSE
 {
-    $$ = create_node_valor_lexico($1);
+    $$ = create_node_valor_lexico($1, DATA_TYPE_BOOL);
+    TableEntryValue value = create_table_entry_value(SYMBOL_NATURE_LITERAL, DATA_TYPE_BOOL, $1);
+    add_symbol_value_to_global_table_stack(value);
 };
 %%
 
