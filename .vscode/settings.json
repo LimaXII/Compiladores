@@ -5,6 +5,7 @@
         "ast_tree.h": "c",
         "errors.h": "c",
         "table.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "stdio.h": "c"
     }
 }

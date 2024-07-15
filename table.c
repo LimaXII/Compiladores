@@ -158,7 +158,7 @@ TableEntryValue create_table_entry_value(SymbolNature symbol_nature, DataType da
 
 void free_table_entry_value(TableEntryValue value){
     // Libera o valor léxico associado
-    free_lexical_value(value.valor_lexico);
+    freeValor_lexico(value.valor_lexico);
 }
 
 void free_table(Table* table){
@@ -411,11 +411,11 @@ void print_entry(TableEntry* entry){
 }
 
 void print_entry_value(TableEntryValue value){
-    print_lexical_value(value.valor_lexico);
+    printValor_lexico(value.valor_lexico);
 }
 
 DataType infer_type_from_identifier(Valor_lexico identifier){
-    TableEntryValue value = get_table_value_by_key(identifier.token_val);
+    TableEntryValue value = get_symbol_from_stack_by_key(identifier.token_val);
     if(value.symbol_nature == SYMBOL_NATURE_NON_EXISTENT){
         printf("Erro semântico: O identificador \"%s\" (linha %d) não foi declarado nesse escopo\n", 
         identifier.token_val, identifier.line_number
@@ -423,11 +423,11 @@ DataType infer_type_from_identifier(Valor_lexico identifier){
         exit(ERR_UNDECLARED);
     }
 
-    return value.dataType;
+    return value.data_type;
 }
 
 void check_identifier_is_variable(Valor_lexico identifier){
-    TableEntryValue value = get_table_value_by_key(identifier.token_val);
+    TableEntryValue value = get_symbol_from_stack_by_key(identifier.token_val);
     if(value.symbol_nature != SYMBOL_NATURE_IDENTIFIER){
         printf("Erro semântico: O identificador \"%s\" (linha %d) foi usado como variável, mas foi declarado como função (linha %d)\n", 
         identifier.token_val, identifier.line_number, value.line_number
@@ -437,7 +437,7 @@ void check_identifier_is_variable(Valor_lexico identifier){
 }
 
 void check_identifier_is_function(Valor_lexico identifier){
-    TableEntryValue value = get_table_value_by_key(identifier.token_val);
+    TableEntryValue value = get_symbol_from_stack_by_key(identifier.token_val);
     if(value.symbol_nature != SYMBOL_NATURE_FUNCTION){
         printf("Erro semântico: O identificador \"%s\" (linha %d) foi usado como função, mas foi declarado como variável (linha %d)\n", 
         identifier.token_val, identifier.line_number, value.line_number

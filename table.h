@@ -19,6 +19,7 @@ typedef enum DataType
 
 DataType infer_type_from_types(DataType first_type, DataType second_type);
 
+#define N_TABLE_BUCKETS 32
 // Natureza de um símbolo
 typedef enum SymbolNature
 {
