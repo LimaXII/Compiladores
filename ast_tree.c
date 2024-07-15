@@ -112,6 +112,19 @@ void exporta(Node* node) {
     print_tree_hierarchy(node);
 }
 
+void remove_node(Node* node){
+    if (node == NULL) return;
+
+    freeValor_lexico(node->valor_lexico);
+
+    for (int i = 0; i < node->child_count; i++) {
+        remove_node(node->children[i]);
+    }
+
+    free(node->children);
+    free(node);
+}
+
 DataType infer_type_from_node(Node* node){
     return node->data_type;
 }

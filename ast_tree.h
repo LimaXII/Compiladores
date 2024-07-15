@@ -25,6 +25,7 @@ void print_tree_labels(Node* node);         // Printa endereço e label, no form
 void print_tree_hierarchy(Node* node);      // Printa hierarquia, no formato: 0x8235900, 0x82358e8.
 void free_tree(Node* node);                 // Libera memória. 
 void exporta(Node* node);                   // Exporta a árvore.
+void remove_node(Node * node);
 
 DataType infer_type_from_node(Node* node);
 DataType infer_type_from_nodes(Node* node1, Node* node2);

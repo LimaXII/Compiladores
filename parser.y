@@ -126,16 +126,21 @@ element: global_vars_declaration
 global_vars_declaration: type ident_list ','
 {
     $$ = NULL;
+    remove_node($2);
+
+    declared_type = DATA_TYPE_UNDECLARED;
 }
 ident_list: TK_IDENTIFICADOR ';' ident_list
 {
     $$ = NULL;
-    freeValor_lexico($1);
+    TableEntryValue value = create_table_entry_value(SYMBOL_NATURE_IDENTIFIER, declared_type, $1);
+    add_symbol_value_to_global_table_stack(value);
 }
 | TK_IDENTIFICADOR
 {
     $$ = NULL;
-    freeValor_lexico($1);
+    TableEntryValue value = create_table_entry_value(SYMBOL_NATURE_IDENTIFIER, declared_type, $1);
+    add_symbol_value_to_global_table_stack(value);
 };
 
 // -- Funções --
@@ -144,8 +149,10 @@ function: header body
     $$ = $1;
     if ($2){
         add_child($$, $2);
+        pop_global_stack();
     }
 };
+
 // Cabeçalho da função. Podendo conter uma lista de parametros ou nenhum parametro.
 header: '(' parameters_list ')' TK_OC_OR type '/' TK_IDENTIFICADOR 
 {
@@ -167,6 +174,7 @@ parameter: type TK_IDENTIFICADOR{
     $$ = NULL;
     freeValor_lexico($2);
 };
+
 // Corpo da função. Contendo um bloco de comandos.
 body: command_block
 {
@@ -237,11 +245,13 @@ function_call: TK_IDENTIFICADOR '(' arguments ')'
 {
     $$ = create_node_function($1);
 };
+
 return_command: TK_PR_RETURN expression
 {
     $$ = create_node_token($1);
     add_child($$, $2);
 };
+
 control_command: TK_PR_IF '(' expression ')' command_block 
 {
     $$ = create_node_token($1);
