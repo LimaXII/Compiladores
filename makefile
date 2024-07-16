@@ -5,7 +5,7 @@ CFLAGS = -I$(IDIR)
 ODIR = ./
 LDIR = ./
 
-_OBJ = main.o lex.yy.o parser.tab.o valor_lexico.o ast_tree.o
+_OBJ = main.o lex.yy.o parser.tab.o valor_lexico.o ast_tree.o table.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 all: etapa4
@@ -28,8 +28,12 @@ $(ODIR)/parser.tab.o: $(ODIR)/parser.tab.c
 $(ODIR)/lex.yy.o: $(ODIR)/lex.yy.c
 	$(CC) -c $< -o $@ $(CFLAGS)
 
-# Faz questão de que o arquivo paser.tab.h já esteja compilado antes do main.c.
+# Faz questão de que o arquivo parser.tab.h já esteja compilado antes do main.c.
 $(ODIR)/main.o: main.c $(ODIR)/parser.tab.h
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+# Regra para compilar table.o
+$(ODIR)/table.o: table.c table.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 etapa4: $(OBJ)
@@ -39,4 +43,4 @@ etapa4: $(OBJ)
 
 # Remove todos os arquivos necessários.
 clean:
-	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ etapa4 $(ODIR)/lex.yy.c $(ODIR)/parser.tab.c $(ODIR)/parser.tab.h
+	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ etapa4 $(ODIR)/lex.yy.c $(ODIR)/parser.tab.c $(ODIR)/parser.tab.h table_test
