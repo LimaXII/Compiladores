@@ -57,7 +57,7 @@ Node* mainFunctionNode = NULL;
 %type<node> element
 %type<node> global_vars_declaration
 %type<node> function
-%type<node> type
+%type<data_type> type
 %type<node> operands
 %type<node> literal
 %type<node> ident_list
@@ -351,7 +351,7 @@ expression4: expression4 TK_OC_LE expression3
 }
 | expression4 TK_OC_GE expression3 
 {
-    $$ = create_node_token($2, infer_type_from_nodes($1, $3)););
+    $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
 }
@@ -434,7 +434,7 @@ negation_expression: negation_expression '!'
 }
 | '!'
 {
-    $$ = create_node_token($1, infer_type_from_node($1));
+    $$ = create_node_token($1, );
 };
 minus_expressison: minus_expressison '-' 
 {
@@ -443,7 +443,7 @@ minus_expressison: minus_expressison '-'
 }
 | '-' 
 {
-    $$ = create_node_token($1, infer_type_from_node($1));
+    $$ = create_node_token($1, );
 };
 
 expression0: operands 

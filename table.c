@@ -35,30 +35,6 @@ DataType infer_type_from_types(DataType first_type, DataType second_type){
     return inferred_type;
 }
 
-/*
-
-    ESTRUTURA DA PILHA DE TABELAS
-
-                                TableStack -> Table
-                                    v
-                                TableStack -> Table
-                                    v
-    globalTableStack ->        TableStack -> Table
-
-*/
-
-//////////////////////////////////////////////////////////////
-
-//          CRIAÇÃO DE ESTRUTURAS DE DADOS
-
-//////////////////////////////////////////////////////////////
-
-/*
-
-    Cria a pilha global de símbolos
-
-*/
-
 void init_global_symbol_stack()
 {
     globalTableStack = create_table_stack();
@@ -239,6 +215,7 @@ TableEntryValue get_table_value_by_key(Table* table, char* key)
 }
 
 // djba2 hash function
+// MUDA ISSO MALUCO
 size_t get_index(size_t capacity, char* key)
 {
     unsigned long hash = 5381;
