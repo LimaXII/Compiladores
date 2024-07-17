@@ -13,7 +13,7 @@ int get_line_number();
 int yylex(void);
 void yyerror (char const *message);
 extern Node* arvore;
-extern SymbolTableStack* globalSymbolTableStack;
+extern TableStack* globalSymbolTableStack;
 
 DataType declared_type = DATA_TYPE_UNDECLARED; // O tipo atualmente declarado
 Node* mainFunctionNode = NULL;
@@ -434,7 +434,8 @@ negation_expression: negation_expression '!'
 }
 | '!'
 {
-    $$ = create_node_token($1, );
+    DataType declared_exclamation = DATA_TYPE_PLACEHOLDER;
+    $$ = create_node_token($1, declared_exclamation);
 };
 minus_expressison: minus_expressison '-' 
 {
@@ -443,7 +444,8 @@ minus_expressison: minus_expressison '-'
 }
 | '-' 
 {
-    $$ = create_node_token($1, );
+    DataType declared_minus = DATA_TYPE_PLACEHOLDER;
+    $$ = create_node_token($1, declared_minus);
 };
 
 expression0: operands 
