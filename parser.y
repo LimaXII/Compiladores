@@ -13,7 +13,7 @@ int get_line_number();
 int yylex(void);
 void yyerror (char const *message);
 extern Node* arvore;
-extern TableStack* globalSymbolTableStack;
+extern TableStack* globalTableStack;
 
 DataType declared_type = DATA_TYPE_UNDECLARED; // O tipo atualmente declarado
 Node* mainFunctionNode = NULL;
