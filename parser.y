@@ -13,7 +13,6 @@ int get_line_number();
 int yylex(void);
 void yyerror (char const *message);
 extern Node* arvore;
-extern TableStack* globalTableStack;
 
 DataType declared_type = DATA_TYPE_UNDECLARED; // O tipo atualmente declarado
 Node* mainFunctionNode = NULL;
@@ -136,6 +135,7 @@ ident_list: TK_IDENTIFICADOR ';' ident_list
     TableEntryValue value = create_table_entry_value(SYMBOL_NATURE_IDENTIFIER, declared_type, $1);
     add_symbol_value_to_global_table_stack(value);
 }
+
 | TK_IDENTIFICADOR
 {
     $$ = NULL;

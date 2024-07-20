@@ -1,6 +1,6 @@
 int va,
-(float k; int l)|int/fa
+int vc,
+(float k; int l)|int/functionteste
 {
   int a,
 }
-int vc,
