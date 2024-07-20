@@ -374,7 +374,7 @@ void print_table(Table* table){
 
 void print_bucket(TableBucket* bucket){
     TableEntry* entry = bucket->entries;
-    printf("bucket %d\n", bucket->n);
+    //printf("bucket %d\n", bucket->n);
 
     while(entry != NULL){
         print_entry(entry);

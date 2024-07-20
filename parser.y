@@ -62,6 +62,8 @@ Node* mainFunctionNode = NULL;
 %type<node> ident_list
 %type<node> header
 %type<node> body
+%type<node> function_argument_init
+%type<node> function_arguments
 %type<node> parameters_list
 %type<node> parameter
 %type<node> command_block
@@ -149,19 +151,18 @@ function: header body
     $$ = $1;
     if ($2){
         add_child($$, $2);
-        pop_global_stack();
     }
+    pop_global_stack();
 };
 
 // Cabeçalho da função. Podendo conter uma lista de parametros ou nenhum parametro.
-header: '(' parameters_list ')' TK_OC_OR type '/' TK_IDENTIFICADOR 
+header: function_arguments TK_OC_OR type '/' TK_IDENTIFICADOR 
 {
-    $$ = create_node_valor_lexico($7, $5);
+    TableEntryValue value = create_table_entry_value(SYMBOL_NATURE_FUNCTION, declared_type, $5);
+    add_symbol_value_to_below_global_table_stack(value);
+
+    $$ = create_node_valor_lexico($5, $3);
 }
-| '('')' TK_OC_OR type '/' TK_IDENTIFICADOR
-{
-    $$ = create_node_valor_lexico($6, $4);
-};
 parameters_list: parameter ';' parameters_list
 {
     $$ = NULL;
@@ -180,6 +181,22 @@ body: command_block
 {
     $$ = $1;
 };
+
+function_argument_init: '('
+{
+    add_table_to_global_stack(create_table());
+}
+
+function_arguments: function_argument_init ')'
+{
+    $$ = NULL;
+};
+
+function_arguments: function_argument_init parameters_list ')'
+{
+    $$ = NULL;
+};
+
 command_block: '{' simple_command_list '}' 
 {
     $$ = $2;
