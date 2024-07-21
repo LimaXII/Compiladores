@@ -2,6 +2,10 @@
     "files.associations": {
         "stdlib.h": "c",
         "valor_lexico.h": "c",
-        "ast_tree.h": "c"
+        "ast_tree.h": "c",
+        "errors.h": "c",
+        "table.h": "c",
+        "string.h": "c",
+        "stdio.h": "c"
     }
 }

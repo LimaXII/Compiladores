@@ -2,6 +2,7 @@
 /* Luccas da Silva Lima 00324683 */
 /* Matheus Almeida da Silva 00316326 */
 
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -27,5 +28,6 @@ typedef struct Valor_lexico
 // Funções implementadas.
 Valor_lexico createValor_lexico(char* token_val, TokenType type, int line_number);
 void freeValor_lexico(Valor_lexico valor_lexico);
+void printValor_lexico(Valor_lexico valor_lexico);
 
 #endif // VALOR_LEXICO_H

@@ -6,18 +6,25 @@
 #include <stdio.h>
 #include "valor_lexico.h"
 #include "ast_tree.h"
+#include "table.h"
 
 // Importa as funções necessárias.
 int get_line_number();
 int yylex(void);
 void yyerror (char const *message);
-extern void* arvore;
+extern Node* arvore;
+
+DataType declared_type = TYPE_UNDECLARED; // O tipo atualmente declarado
+Node* mainFunctionNode = NULL;
+
 %}
 
 %union{
     Valor_lexico valor_lexico;
     struct Node* node;
     char* ast_token;
+    DataType data_type;
+    Nature nature;
 }
 
 %define parse.error verbose
@@ -49,12 +56,14 @@ extern void* arvore;
 %type<node> element
 %type<node> global_vars_declaration
 %type<node> function
-%type<node> type
+%type<data_type> type
 %type<node> operands
 %type<node> literal
 %type<node> ident_list
 %type<node> header
 %type<node> body
+%type<node> function_argument_init
+%type<node> function_arguments
 %type<node> parameters_list
 %type<node> parameter
 %type<node> command_block
@@ -118,16 +127,22 @@ element: global_vars_declaration
 global_vars_declaration: type ident_list ','
 {
     $$ = NULL;
+    remove_node($2);
+
+    declared_type = TYPE_UNDECLARED;
 }
 ident_list: TK_IDENTIFICADOR ';' ident_list
 {
     $$ = NULL;
-    freeValor_lexico($1);
+    TableEntry value = create_table_entry(NATURE_IDENTIFIER, declared_type, $1);
+    add_entry_to_global_stack(value);
 }
+
 | TK_IDENTIFICADOR
 {
     $$ = NULL;
-    freeValor_lexico($1);
+    TableEntry value = create_table_entry(NATURE_IDENTIFIER, declared_type, $1);
+    add_entry_to_global_stack(value);
 };
 
 // -- Funções --
@@ -137,16 +152,17 @@ function: header body
     if ($2){
         add_child($$, $2);
     }
+    pop_global_stack();
 };
+
 // Cabeçalho da função. Podendo conter uma lista de parametros ou nenhum parametro.
-header: '(' parameters_list ')' TK_OC_OR type '/' TK_IDENTIFICADOR 
+header: function_arguments TK_OC_OR type '/' TK_IDENTIFICADOR 
 {
-    $$ = create_node_valor_lexico($7);
+    TableEntry value = create_table_entry(NATURE_FUNCTION, declared_type, $5);
+    add_entry_to_lower_stack(value);
+
+    $$ = create_node_valor_lexico($5, $3);
 }
-| '('')' TK_OC_OR type '/' TK_IDENTIFICADOR
-{
-    $$ = create_node_valor_lexico($6);
-};
 parameters_list: parameter ';' parameters_list
 {
     $$ = NULL;
@@ -157,13 +173,34 @@ parameters_list: parameter ';' parameters_list
 };
 parameter: type TK_IDENTIFICADOR{
     $$ = NULL;
+    
+     // Adiciona identificador à tabela de tipos
+    TableEntry value = create_table_entry(NATURE_IDENTIFIER, declared_type, $2);
+    add_entry_to_global_stack(value);
+
     freeValor_lexico($2);
 };
+
 // Corpo da função. Contendo um bloco de comandos.
 body: command_block
 {
     $$ = $1;
 };
+
+function_argument_init: '('
+{
+    push_table_to_global_stack(create_table());
+}
+
+function_arguments: function_argument_init ')'
+{
+    $$ = NULL;
+};
+| function_argument_init parameters_list ')'
+{
+    $$ = NULL;
+};
+
 command_block: '{' simple_command_list '}' 
 {
     $$ = $2;
@@ -216,27 +253,38 @@ command: command_block ','
 };
 attribution_command: TK_IDENTIFICADOR '=' expression
 {
-    $$ = create_node_token($2);
-    add_child($$, create_node_valor_lexico($1));
+    DataType type = get_type_from_identifier($1);
+    validate_variable_identifier($1);
+    
+    $$ = create_node_token($2, type);
+    add_child($$, create_node_valor_lexico($1, type));
     add_child($$, $3);
 };
 function_call: TK_IDENTIFICADOR '(' arguments ')'
 {
-    $$ = create_node_function($1);
+    DataType type = get_type_from_identifier($1);
+    validate_function_identifier($1);
+
+    $$ = create_node_function($1, type);
     add_child($$, $3);
 } 
 | TK_IDENTIFICADOR '('')'
 {
-    $$ = create_node_function($1);
+    DataType type = get_type_from_identifier($1);
+    validate_function_identifier($1);
+
+    $$ = create_node_function($1, type);
 };
+
 return_command: TK_PR_RETURN expression
 {
-    $$ = create_node_token($1);
+    $$ = create_node_token($1, infer_type_from_node($2));
     add_child($$, $2);
 };
+
 control_command: TK_PR_IF '(' expression ')' command_block 
 {
-    $$ = create_node_token($1);
+    $$ = create_node_token($1, infer_type_from_node($3));
     add_child($$, $3);
     if ($5){
         add_child($$, $5);
@@ -244,7 +292,7 @@ control_command: TK_PR_IF '(' expression ')' command_block
 }
 | TK_PR_IF '(' expression ')' command_block TK_PR_ELSE command_block 
 {
-    $$ = create_node_token($1);
+    $$ = create_node_token($1, infer_type_from_node($3));
     add_child($$, $3);
     if ($5){
         add_child($$, $5);
@@ -255,7 +303,7 @@ control_command: TK_PR_IF '(' expression ')' command_block
 }
 | TK_PR_WHILE '(' expression ')' command_block
 {
-    $$ = create_node_token($1);
+    $$ = create_node_token($1, infer_type_from_node($3));
     add_child($$, $3);
     if ($5){
         add_child($$, $5);
@@ -279,7 +327,7 @@ expression: expression7
 // Grau 7 de precedencia das expressões. Pode ser um OR ou uma expressão mais prioritária.
 expression7: expression7 TK_OC_OR expression6 
 {
-    $$ = create_node_token($2);
+    $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
 }
@@ -290,7 +338,7 @@ expression7: expression7 TK_OC_OR expression6
 // Grau 6 de precedencia. Pode ser um AND ou uma expressão mais prioritária.
 expression6: expression6 TK_OC_AND expression5 
 {
-    $$ = create_node_token($2);
+    $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
 }
@@ -301,13 +349,13 @@ expression6: expression6 TK_OC_AND expression5
 // Grau 5 de precedencia. Pode ser um EQUAL ou um NOT EQUAL ou uma expressão mais prioritária.
 expression5: expression5 TK_OC_EQ expression4 
 {
-    $$ = create_node_token($2);
+    $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
 }
 | expression5 TK_OC_NE expression4 
 {
-    $$ = create_node_token($2);
+    $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
 }
@@ -318,25 +366,25 @@ expression5: expression5 TK_OC_EQ expression4
 // Grau 4 de precedencia. Pode ser um < ou um > ou um LessEqual ou um GreaterEqual ou uma expressão mais prioritária.
 expression4: expression4 TK_OC_LE expression3 
 {
-    $$ = create_node_token($2);
+    $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
 }
 | expression4 TK_OC_GE expression3 
 {
-    $$ = create_node_token($2);
+    $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
 }
 | expression4 '<' expression3 
 {
-    $$ = create_node_token($2);
+    $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
 }
 | expression4 '>' expression3 
 {
-    $$ = create_node_token($2);
+    $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
 }
@@ -347,13 +395,13 @@ expression4: expression4 TK_OC_LE expression3
 // Grau 3 de precedencia. Pode ser uma adição ou uma subtração ou uma expressão mais prioritária.
 expression3: expression3 '+' expression2 
 {
-    $$ = create_node_token($2);
+    $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
 }
 | expression3 '-' expression2 
 {
-    $$ = create_node_token($2);
+    $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
 }
@@ -364,19 +412,19 @@ expression3: expression3 '+' expression2
 // Grau 2 de precedencia. Pode ser uma * ou / ou % ou uma expressão mais prioritária.
 expression2: expression2 '*' expression1 
 {
-    $$ = create_node_token($2);
+    $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
 }
 | expression2 '/' expression1 
 {
-    $$ = create_node_token($2);
+    $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
 }
 | expression2 '%' expression1 
 {
-    $$ = create_node_token($2);
+    $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
 }
@@ -402,21 +450,23 @@ expression1: negation_expression expression0
 
 negation_expression: negation_expression '!' 
 {
-    $$ = create_node_token($2);
+    $$ = create_node_token($2, infer_type_from_node($1));
     add_child($$, $1);
 }
 | '!'
 {
-    $$ = create_node_token($1);
+    DataType declared_exclamation = TYPE_PLACEHOLDER;
+    $$ = create_node_token($1, declared_exclamation);
 };
 minus_expressison: minus_expressison '-' 
 {
-    $$ = create_node_token($2);
+    $$ = create_node_token($2, infer_type_from_node($1));
     add_child($$, $1);
 }
 | '-' 
 {
-    $$ = create_node_token($1);
+    DataType declared_minus = TYPE_PLACEHOLDER;
+    $$ = create_node_token($1, declared_minus);
 };
 
 expression0: operands 
@@ -429,7 +479,10 @@ expression0: operands
 };
 operands: TK_IDENTIFICADOR 
 {
-    $$ = create_node_valor_lexico($1);
+    DataType type = get_type_from_identifier($1);
+    validate_variable_identifier($1);
+
+    $$ = create_node_valor_lexico($1, type);
 }
 | literal 
 {
@@ -443,38 +496,45 @@ operands: TK_IDENTIFICADOR
 // -- Tipos --
 type: TK_PR_INT
 {
-    $$ = NULL;
+    declared_type = TYPE_INT;
+    $$ = TYPE_INT;
 } 
 | TK_PR_FLOAT 
 {
-    $$ = NULL;
+    declared_type = TYPE_FLOAT;
+    $$ = TYPE_FLOAT;
 }
 | TK_PR_BOOL
 {
-    $$ = NULL;
+    declared_type = TYPE_BOOL;
+    $$ = TYPE_BOOL;
 };
 
 // -- Literais --
 literal: TK_LIT_INT
 {
-    $$ = create_node_valor_lexico($1);
+    $$ = create_node_valor_lexico($1, TYPE_INT);
 } 
 | TK_LIT_FLOAT 
 {
-    $$ = create_node_valor_lexico($1);
+    $$ = create_node_valor_lexico($1, TYPE_FLOAT);
 }
 | TK_LIT_TRUE 
 {
-    $$ = create_node_valor_lexico($1);
+    $$ = create_node_valor_lexico($1, TYPE_BOOL);
+    TableEntry value = create_table_entry(NATURE_LITERAL, TYPE_BOOL, $1);
+    add_entry_to_global_stack(value);
 }
 | TK_LIT_FALSE
 {
-    $$ = create_node_valor_lexico($1);
+    $$ = create_node_valor_lexico($1, TYPE_BOOL);
+    TableEntry value = create_table_entry(NATURE_LITERAL, TYPE_BOOL, $1);
+    add_entry_to_global_stack(value);
 };
 %%
 
 // Função que imprime na tela o erro encontrado.
 void yyerror(char const *message)
 {
-    printf("Erro encontrado na linha %d: %s\n", get_line_number(), message);
-}
+    printf("Erro Sintático encontrado na linha %d: %s\n", get_line_number(), message);
+} 

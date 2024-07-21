@@ -24,3 +24,11 @@ void freeValor_lexico(Valor_lexico valor_lexico)
     }
     free(valor_lexico.token_val);
 }
+
+void printValor_lexico(Valor_lexico valor_lexico) {
+    printf("Valor_lexico {\n");
+    printf("    line_number: %d,\n", valor_lexico.line_number);
+    printf("    type: %d,\n", valor_lexico.type);
+    printf("    token_val: %s\n", valor_lexico.token_val);
+    printf("}\n");
+}

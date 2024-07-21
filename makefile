@@ -5,10 +5,10 @@ CFLAGS = -I$(IDIR)
 ODIR = ./
 LDIR = ./
 
-_OBJ = main.o lex.yy.o parser.tab.o valor_lexico.o ast_tree.o
+_OBJ = main.o lex.yy.o parser.tab.o valor_lexico.o ast_tree.o table.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
-all: etapa3
+all: etapa4
 
 # Comando do bison para gerar o parser.tab.c
 $(ODIR)/parser.tab.c $(ODIR)/parser.tab.h: parser.y
@@ -28,15 +28,19 @@ $(ODIR)/parser.tab.o: $(ODIR)/parser.tab.c
 $(ODIR)/lex.yy.o: $(ODIR)/lex.yy.c
 	$(CC) -c $< -o $@ $(CFLAGS)
 
-# Faz questão de que o arquivo paser.tab.h já esteja compilado antes do main.c.
+# Faz questão de que o arquivo parser.tab.h já esteja compilado antes do main.c.
 $(ODIR)/main.o: main.c $(ODIR)/parser.tab.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-etapa3: $(OBJ)
+# Regra para compilar table.o
+$(ODIR)/table.o: table.c table.h
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+etapa4: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 .PHONY: clean
 
 # Remove todos os arquivos necessários.
 clean:
-	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ etapa3 $(ODIR)/lex.yy.c $(ODIR)/parser.tab.c $(ODIR)/parser.tab.h
+	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ etapa4 $(ODIR)/lex.yy.c $(ODIR)/parser.tab.c $(ODIR)/parser.tab.h table_test

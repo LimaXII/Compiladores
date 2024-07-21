@@ -7,7 +7,7 @@
 #include "ast_tree.h"
 
 // Função para criar um novo nodo.
-Node* create_node_valor_lexico(Valor_lexico valor_lexico) {
+Node* create_node_valor_lexico(Valor_lexico valor_lexico, DataType data_type) {
     // Aloca memória do tamanho de um nodo.
     Node* new_node = (Node*)malloc(sizeof(Node));       
     if (new_node == NULL) {
@@ -18,12 +18,13 @@ Node* create_node_valor_lexico(Valor_lexico valor_lexico) {
     new_node->valor_lexico = valor_lexico;      
     new_node->children = NULL;
     new_node->daddy = NULL;
+    new_node->data_type = data_type;
     new_node->child_count = 0;
     return new_node;
 }
 
-Node* create_node_function(Valor_lexico valor_lexico) {
-    Node* node = create_node_valor_lexico(valor_lexico);
+Node* create_node_function(Valor_lexico valor_lexico, DataType data_type) {
+    Node* node = create_node_valor_lexico(valor_lexico, data_type);
 
     char* start = "call ";
     char* newtoken_val = malloc(strlen(start) + strlen(node->valor_lexico.token_val) + 1);
@@ -37,7 +38,7 @@ Node* create_node_function(Valor_lexico valor_lexico) {
     return node;
 }
 
-Node* create_node_token(char* token){
+Node* create_node_token(char* token, DataType data_type){
     Node* new_node = (Node*)malloc(sizeof(Node));       
     if (new_node == NULL) {
         fprintf(stderr, "Erro ao alocar memória para um novo nó.\n");
@@ -51,6 +52,7 @@ Node* create_node_token(char* token){
 
     new_node->children = NULL;
     new_node->daddy = NULL;
+    new_node->data_type = data_type;
     new_node->child_count = 0;
     return new_node;
 }
@@ -108,4 +110,27 @@ void exporta(Node* node) {
     // 2. 0x8235900, 0x82358e8.
     print_tree_token_vals(node);
     print_tree_hierarchy(node);
+}
+
+void remove_node(Node* node){
+    if (node == NULL) return;
+
+    freeValor_lexico(node->valor_lexico);
+
+    for (int i = 0; i < node->child_count; i++) {
+        remove_node(node->children[i]);
+    }
+
+    free(node->children);
+    free(node);
+}
+
+DataType infer_type_from_node(Node* node){
+    return node->data_type;
+}
+
+DataType infer_type_from_nodes(Node* node1, Node* node2){
+    DataType inferred_type = determine_data_type(node1->data_type, node2->data_type);
+
+    return inferred_type;
 }

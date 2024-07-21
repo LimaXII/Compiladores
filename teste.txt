@@ -1,6 +1,4 @@
-int va,
-(float k; int l)|int/fa
-{
+() | int / f {
   int a,
+float a,
 }
-int vc,
