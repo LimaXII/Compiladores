@@ -1,5 +1,9 @@
-#ifndef TABLE_H
-#define TABLE_H
+/* ======= GRUPO J ======= */
+/* Luccas da Silva Lima 00324683 */
+/* Matheus Almeida da Silva 00316326 */
+
+#ifndef SYMBOL_TABLE_H
+#define SYMBOL_TABLE_H
 
 #include <stdio.h>
 #include <string.h>
@@ -10,55 +14,56 @@
 // Tipo de Dado
 typedef enum DataType
 {
-    DATA_TYPE_INT,
-    DATA_TYPE_FLOAT,
-    DATA_TYPE_BOOL,
-    DATA_TYPE_UNDECLARED,
-    DATA_TYPE_PLACEHOLDER
+    TYPE_INT,
+    TYPE_FLOAT,
+    TYPE_BOOL,
+    TYPE_UNDECLARED,
+    TYPE_PLACEHOLDER
 } DataType;
 
-DataType infer_type_from_types(DataType first_type, DataType second_type);
+DataType determine_data_type(DataType type1, DataType type2);
 
-#define N_TABLE_BUCKETS 32
+#define TABLE_BUCKET_COUNT 32
 // Natureza de um símbolo
-typedef enum SymbolNature
+typedef enum Nature
 {
-    SYMBOL_NATURE_IDENTIFIER,
-    SYMBOL_NATURE_LITERAL,
-    SYMBOL_NATURE_FUNCTION,
-    SYMBOL_NATURE_NON_EXISTENT
-} SymbolNature;
+    NATURE_IDENTIFIER,
+    NATURE_LITERAL,
+    NATURE_FUNCTION,
+    NATURE_NON_EXISTENT
+} Nature;
 
 // Conteúdo de uma entrada na tabela
-typedef struct TableEntryValue
-{
-    int line_number;
-    SymbolNature symbol_nature;
-    DataType data_type;
-    Valor_lexico valor_lexico;
-} TableEntryValue;
-
-// Entrada na tabela de símbolos
 typedef struct TableEntry
 {
-    char* key;
-    TableEntryValue value;
-    struct TableEntry* next;
+    int line;
+    Nature nature;
+    DataType type;
+    Valor_lexico lex_val;
 } TableEntry;
 
+// Entrada na tabela de símbolos
+typedef struct TableNode
+{
+    char* identifier;
+    TableEntry entry;
+    struct TableNode* next;
+} TableNode;
+
+// Um bucket da tabela de símbolos (contém todas entradas que mapeiam para um mesmo índice)
 // Um bucket da tabela de símbolos (contém todas entradas que mapeiam para um mesmo índice)
 typedef struct TableBucket
 {
-    int n;
-    TableEntry* entries;
+    int index;
+    TableNode* nodes;
 } TableBucket;
 
 // Uma tabela de símbolo (um frame da stack)
-#define N_SYMBOL_TABLE_BUCKETS 32
+#define TABLE_BUCKET_COUNT 32
 
 typedef struct Table
 {
-    int n_buckets;
+    int bucket_count;
     TableBucket* buckets;
 } Table;
 
@@ -66,15 +71,15 @@ typedef struct Table
 typedef struct TableStack
 {
     Table* table;
-    struct TableStack* next_item;    
+    struct TableStack* next;    
 } TableStack;
 
 extern TableStack* globalTableStack;
 
-void init_global_symbol_stack();
-void add_table_to_global_stack(Table* table);
+void initialize_global_stack();
+void push_table_to_global_stack(Table* table);
 void pop_global_stack();
-void copy_symbols_to_global_stack_below();
+void transfer_to_lower_stack();
 
 // Criação de uma nova pilha de tabela de símbolos
 TableStack* create_table_stack();
@@ -83,58 +88,42 @@ TableStack* create_table_stack();
 Table* create_table();
 
 // Criação de um valor de símbolo para a tabela de símbolos
-TableEntryValue create_table_entry_value(SymbolNature symbol_nature, DataType data_type, Valor_lexico valor_lexico);
+TableEntry create_table_entry(Nature nature, DataType type, Valor_lexico lex_val);
 
-// Operações de liberação de memória
-void free_table_entry_value(TableEntryValue value);
+// Liberação de memória
+void free_table_entry(TableEntry entry);
 void free_table(Table* table);
 void free_table_stack(TableStack* stack);
 
-//////////////////////////////////////////////////////////////
-//          OPERAÇÕES COM CHAVES E VALORES
-//////////////////////////////////////////////////////////////
+// Operações com chaves.
 
-// Retorna uma entrada vazia
-TableEntryValue get_empty_table_entry_value();
+TableEntry get_empty_table_entry();
+TableEntry get_entry_by_key(Table* table, char* key);
+TableEntry find_in_stack(char* key);
+size_t fnv1a_hash(size_t capacity, char* key);
+int compare_keys(TableNode* node, char* key);
 
-// Checa se há um valor associado a uma chave numa tabela
-TableEntryValue get_table_value_by_key(Table* table, char* key);
+// Operações que a tabela de pilhas.
 
-// Percorre as tabelas da pilha por um valor associado à chave
-TableEntryValue get_symbol_from_stack_by_key(char* key);
-
-// djba2 hash function
-size_t get_index(size_t capacity, char* key);
-
-int is_same_key(TableEntry* entry, char* key);
-
-//////////////////////////////////////////////////////////////
-//          OPERAÇÕES COM A TABELA DE PILHAS
-//////////////////////////////////////////////////////////////
-
-// Adiciona um símbolo a uma tabela de símbolos
-void add_symbol_value_to_global_table_stack(TableEntryValue value);
-void add_symbol_value_to_below_global_table_stack(TableEntryValue value);
-void add_symbol_value_to_table(Table* table, TableEntryValue value);
+void add_entry_to_global_stack(TableEntry entry);
+void add_entry_to_lower_stack(TableEntry entry);
+void add_entry_to_table(Table* table, TableEntry entry);
 
 // Verifica se a chave já existe em uma tabela dada
-int is_key_in_table(Table* table, char* key);
+int key_exists_in_table(Table* table, char* key);
 
 // Verifica se o símbolo já foi declarado nas tabelas da pilhas
-// (percorre do topo ao fim da pilha)
-void check_symbol_declared(TableEntryValue value);
+void verify_declaration(TableEntry entry);
 
-/////////////////////////////////////////////////////////////
-//          UTILS
-//////////////////////////////////////////////////////////////
+// Funções utilitárias.
 
-void print_global_table_stack(int depth);
-void print_table(Table* table);
-void print_bucket(TableBucket* bucket);
-void print_entry(TableEntry* entry);
-void print_entry_value(TableEntryValue value);
-DataType infer_type_from_identifier(Valor_lexico identifier);
-void check_identifier_is_variable(Valor_lexico identifier);
-void check_identifier_is_function(Valor_lexico identifier);
+void display_global_stack(int depth);
+void display_table(Table* table);
+void display_bucket(TableBucket* bucket);
+void display_node(TableNode* node);
+void display_entry(TableEntry entry);
+DataType get_type_from_identifier(Valor_lexico identifier);
+void validate_variable_identifier(Valor_lexico identifier);
+void validate_function_identifier(Valor_lexico identifier);
 
 #endif

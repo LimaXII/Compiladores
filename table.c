@@ -1,170 +1,141 @@
+/* ======= GRUPO J ======= */
+/* Luccas da Silva Lima 00324683 */
+/* Matheus Almeida da Silva 00316326 */
+
 #include "table.h"
 
-DataType infer_type_from_types(DataType first_type, DataType second_type){
-    DataType inferred_type = DATA_TYPE_PLACEHOLDER;
-    if(first_type == DATA_TYPE_INT){
-        switch(second_type){
-            case DATA_TYPE_INT:     inferred_type = DATA_TYPE_INT;      break;
-            case DATA_TYPE_FLOAT:   inferred_type = DATA_TYPE_FLOAT;    break;
-            case DATA_TYPE_BOOL:    inferred_type = DATA_TYPE_INT;      break;
-            default: printf("Erro: Não foi possível inferir tipos a partir de INT e %d\n", second_type); break;
+DataType determine_data_type(DataType type1, DataType type2){
+    DataType result_type = TYPE_PLACEHOLDER;
+    if(type1 == TYPE_INT){
+        switch(type2){
+            case TYPE_INT:     result_type = TYPE_INT;      break;
+            case TYPE_FLOAT:   result_type = TYPE_FLOAT;    break;
+            case TYPE_BOOL:    result_type = TYPE_INT;      break;
+            default: printf("Erro: Tipo desconhecido para combinação INT e %d\n.", type2); break;
         }
-    }
-
-    else if(first_type == DATA_TYPE_FLOAT){
-           switch(second_type){
-            case DATA_TYPE_INT:     inferred_type = DATA_TYPE_FLOAT;    break;
-            case DATA_TYPE_FLOAT:   inferred_type = DATA_TYPE_FLOAT;    break;
-            case DATA_TYPE_BOOL:    inferred_type = DATA_TYPE_FLOAT;    break;
-            default: printf("Erro: Não foi possível inferir tipos a partir de FLOAT e %d\n", second_type); break;
-        } 
-    }
-
-    else if(first_type == DATA_TYPE_BOOL){
-        switch(second_type){
-            case DATA_TYPE_INT:     inferred_type = DATA_TYPE_INT;      break;
-            case DATA_TYPE_FLOAT:   inferred_type = DATA_TYPE_FLOAT;    break;
-            case DATA_TYPE_BOOL:    inferred_type = DATA_TYPE_BOOL;     break;
-            default: printf("Erro: Não foi possível inferir tipos a partir de BOOL e %d\n", second_type); break;
+    } else if(type1 == TYPE_FLOAT){
+        switch(type2){
+            case TYPE_INT:     result_type = TYPE_FLOAT;    break;
+            case TYPE_FLOAT:   result_type = TYPE_FLOAT;    break;
+            case TYPE_BOOL:    result_type = TYPE_FLOAT;    break;
+            default: printf("Erro: Tipo desconhecido para combinação FLOAT e %d\n.", type2); break;
         }
+    } else if(type1 == TYPE_BOOL){
+        switch(type2){
+            case TYPE_INT:     result_type = TYPE_INT;      break;
+            case TYPE_FLOAT:   result_type = TYPE_FLOAT;    break;
+            case TYPE_BOOL:    result_type = TYPE_BOOL;     break;
+            default: printf("Erro: Tipo desconhecido para combinação BOOL e %d\n.", type2); break;
+        }
+    } else {
+        printf("Erro: Tipo desconhecido para combinação %d e %d\n", type1, type2);
     }
-    else{
-        printf("Erro: Não foi possível inferir tipos a partir de %d e %d\n", first_type, second_type);
-    }
-
-    return inferred_type;
+    return result_type;
 }
 
-void init_global_symbol_stack()
+void initialize_global_stack()
 {
     globalTableStack = create_table_stack();
     globalTableStack->table = create_table();
 }
 
-void add_table_to_global_stack(Table* table)
+void push_table_to_global_stack(Table* table)
 {
     TableStack* new_stack_frame = create_table_stack();
-    // Novo frame aponta para o topo da pilha global
-    new_stack_frame->next_item = globalTableStack;
+    new_stack_frame->next = globalTableStack;
     new_stack_frame->table = table;
-    // O frame se torna o novo topo
     globalTableStack = new_stack_frame; 
 }
 
 void pop_global_stack()
 {
     free_table(globalTableStack->table);
-    globalTableStack = globalTableStack->next_item;
+    globalTableStack = globalTableStack->next;
 }
 
-// Copia os valores 
-void copy_symbols_to_global_stack_below()
+void transfer_to_lower_stack()
 {
-    if(globalTableStack->next_item == NULL){
-        printf("Erro: tentando copiar símbolos para tabela abaixo, mas tabela atual é a global\n");
+    if(globalTableStack->next == NULL){
+        printf("Erro ao copiar os símbolos para tabela abaixo. Não existe tabela abaixo, a atual é a global. \n");
         exit(1);
     }
 
-    int i;
-    for(i=0; i < N_TABLE_BUCKETS; i++){
+    for(int i = 0; i < TABLE_BUCKET_COUNT; i++){
         TableBucket* bucket = &globalTableStack->table->buckets[i];
-        TableEntry* last = bucket->entries;
+        TableNode* node = bucket->nodes;
 
-        while(last != NULL){
-            add_symbol_value_to_table(globalTableStack->next_item->table, last->value);
-            last = last->next;
+        while(node != NULL){
+            add_entry_to_table(globalTableStack->next->table, node->entry);
+            node = node->next;
         }
     }
 }
 
-/*
-
-    Criação de uma nova pilha de tabela de símbolos
-
-*/
+// Cria uma nova pilha.
 TableStack* create_table_stack()
 {
-    TableStack* table_stack = malloc(sizeof(TableStack));
-    if(!table_stack) return NULL;
+    TableStack* stack = malloc(sizeof(TableStack));
+    if(!stack) return NULL;
 
-    table_stack->table = NULL;
-    table_stack->next_item = NULL;
-    return table_stack;
+    stack->table = NULL;
+    stack->next = NULL;
+    return stack;
 }
 
-/*
-
-    Criação de uma nova tabela de símbolos
-
-*/
+// Cria uma nova tabela de simbolos.
 Table* create_table()
 {
     Table* table = malloc(sizeof(Table));
     if (!table) return NULL;
 
-    table->n_buckets = N_TABLE_BUCKETS;
-    table->buckets = calloc(N_TABLE_BUCKETS, sizeof(TableBucket));
+    table->bucket_count = TABLE_BUCKET_COUNT;
+    table->buckets = calloc(TABLE_BUCKET_COUNT, sizeof(TableBucket));
     
-    int i;
-    for(i=0; i<N_TABLE_BUCKETS;i++){
-        table->buckets[i].n = i;
-        table->buckets[i].entries = NULL;
+    for(int i = 0; i < TABLE_BUCKET_COUNT; i++){
+        table->buckets[i].index = i;
+        table->buckets[i].nodes = NULL;
     }
-
     return table;
 }
 
-/*
+// Cria um valor para na tabela de símbolos.
+TableEntry create_table_entry(Nature nature, DataType type, Valor_lexico lex_val){
+    TableEntry entry;
 
-    Criação de um valor de símbolo para a tabela de símbolos
-
-*/
-TableEntryValue create_table_entry_value(SymbolNature symbol_nature, DataType data_type, Valor_lexico valor_lexico){
-    TableEntryValue value;
-
-    value.line_number = valor_lexico.line_number;
-    value.symbol_nature = symbol_nature;
-    value.data_type = data_type;
-    value.valor_lexico = valor_lexico;
-    // Copia a string
-    value.valor_lexico.token_val = strdup(valor_lexico.token_val);
-
-    return value;
+    entry.line = lex_val.line_number;
+    entry.nature = nature;
+    entry.type = type;
+    entry.lex_val = lex_val;
+    entry.lex_val.token_val = strdup(lex_val.token_val);
+    return entry;
 }
 
-void free_table_entry_value(TableEntryValue value){
-    // Libera o valor léxico associado
-    freeValor_lexico(value.valor_lexico);
+void free_table_entry(TableEntry entry){
+    freeValor_lexico(entry.lex_val);
 }
 
 void free_table(Table* table){
-    int i;
-    TableBucket* bucket;
-    TableEntry* entry;
-    TableEntry* next_entry;
-    // Percorre cada bucket e libera suas entradas
-    for(i=0; i < N_TABLE_BUCKETS; i++){
-        bucket = &table->buckets[i];
-        entry = bucket->entries;
-        // Percorre entradas
-        while(entry != NULL){
-            next_entry = entry->next;
-            free(entry->key);
-            free_table_entry_value(entry->value);
-            free(entry);
-            entry = next_entry;
-        }
+    for(int i = 0; i < TABLE_BUCKET_COUNT; i++){
+        TableBucket* bucket = &table->buckets[i];
+        TableNode* node = bucket->nodes;
+        TableNode* next_node;
 
+        while(node != NULL){
+            next_node = node->next;
+            free(node->identifier);
+            free_table_entry(node->entry);
+            free(node);
+            node = next_node;
+        }
     }
     free(table->buckets);
-    // Libera tabela
     free(table);
 }
 
 void free_table_stack(TableStack* stack){
     TableStack* next;
     do{
-        next = stack->next_item;
+        next = stack->next;
         free_table(stack->table);
         free(stack);
         stack = next;
@@ -173,251 +144,197 @@ void free_table_stack(TableStack* stack){
     free(stack);
 }
 
-//////////////////////////////////////////////////////////////
-
-//          OPERAÇÕES COM CHAVES E VALORES
-
-//////////////////////////////////////////////////////////////
-
 // Retorna uma entrada vazia
-TableEntryValue get_empty_table_entry_value()
+TableEntry get_empty_table_entry()
 {
-    TableEntryValue value;
-    value.symbol_nature = SYMBOL_NATURE_NON_EXISTENT;
-    return value;
+    TableEntry entry;
+    entry.nature = NATURE_NON_EXISTENT;
+    return entry;
 }
 
 // Checa se há um valor associado a uma chave
-TableEntryValue get_table_value_by_key(Table* table, char* key)
+TableEntry get_entry_by_key(Table* table, char* key)
 {
-    if (!table) return get_empty_table_entry_value();
+    if (!table) return get_empty_table_entry();
 
-    // Pega o índice do bucket
-    size_t index = get_index(table->n_buckets, key);
-
-    // Obtém o bucket associado à chave
+    size_t index = fnv1a_hash(table->bucket_count, key);
     TableBucket* bucket = &table->buckets[index];
+    TableNode* node = bucket->nodes;
 
-    // Percorre os elementos do bucket até achar match ou o fim do bucket
-    TableEntry* entry = bucket->entries;
-    while(entry != NULL){
-    
-        if (is_same_key(entry, key))
-        {
-            // Match: retorna o valor da entrada
-            return entry->value;
+    while(node != NULL){
+        if (compare_keys(node, key)){
+            return node->entry;
         }
-        entry = entry->next;
-    
+        node = node->next;
     }
 
-    return get_empty_table_entry_value();
+    return get_empty_table_entry();
 }
 
-// djba2 hash function
-// MUDA ISSO MALUCO
-size_t get_index(size_t capacity, char* key)
-{
-    unsigned long hash = 5381;
-    int c;
-    while ((c = *key++))
-    {
-        hash = ((hash << 5) + hash) + c;
+// Hash function
+// FNV-1a (Fowler-Noll-Vo hash function).
+size_t fnv1a_hash(size_t capacity, char* key) {
+    const size_t fnv_prime = 0x100000001b3;
+    const size_t fnv_offset_basis = 0xcbf29ce484222325;
+    size_t hash = fnv_offset_basis;
+
+    while (*key) {
+        hash ^= (unsigned char)*key++;
+        hash *= fnv_prime;
     }
+
     return hash % capacity;
 }
 
-int is_same_key(TableEntry* entry, char* key)
+int compare_keys(TableNode* node, char* key)
 {
-    return strcmp(key, entry->key) == 0;
+    return strcmp(key, node->identifier) == 0;
 }
 
-//////////////////////////////////////////////////////////////
-
-//          OPERAÇÕES COM A TABELA DE PILHAS
-
-//////////////////////////////////////////////////////////////
-
-void add_symbol_value_to_global_table_stack(TableEntryValue value){
-    add_symbol_value_to_table(globalTableStack->table, value);
+// Operações com a Pilha.
+void add_entry_to_global_stack(TableEntry entry){
+    add_entry_to_table(globalTableStack->table, entry);
 }
 
-void add_symbol_value_to_below_global_table_stack(TableEntryValue value){
-    add_symbol_value_to_table(globalTableStack->next_item->table, value);
+void add_entry_to_lower_stack(TableEntry entry){
+    add_entry_to_table(globalTableStack->next->table, entry);
 }
 
 // Adiciona um símbolo a uma tabela de símbolos
-void add_symbol_value_to_table(Table* table, TableEntryValue value){
-
-    // Se não for literal, checa se já foi declarado na tabela
-    if (value.symbol_nature != SYMBOL_NATURE_LITERAL){
-        check_symbol_declared(value);
+void add_entry_to_table(Table* table, TableEntry entry){
+    if (entry.nature != NATURE_LITERAL){
+        verify_declaration(entry);
     }
-    
-    ////////////////////////////
-    // CÁLCULO DA CHAVE
-    ////////////////////////////
-    char* key = strdup(value.valor_lexico.token_val);
 
-    ////////////////////////////
-    // ADIÇÃO À HASH TABLE
-    ////////////////////////////
-    
-    // Pega o índice do bucket
-    size_t index = get_index(table->n_buckets, key);
+    char* key = strdup(entry.lex_val.token_val);
+    size_t index = fnv1a_hash(table->bucket_count, key);
     TableBucket* bucket = &table->buckets[index];
     
-    // Aloca uma nova entrada
-    TableEntry* new_entry = malloc(sizeof(TableEntry));
-    new_entry->key = strdup(key);
-    new_entry->value = value;
-    new_entry->next = NULL;
+    TableNode* new_node = malloc(sizeof(TableNode));
+    new_node->identifier = strdup(key);
+    new_node->entry = entry;
+    new_node->next = NULL;
 
-    // Se já existem elementos no bucket, adiciona ao fim da lista encadeada
-    if(bucket->entries != NULL){
-        TableEntry* cur_entry = bucket->entries;
-        TableEntry* last_entry;
+    if(bucket->nodes != NULL){
+        TableNode* current_node = bucket->nodes;
+        TableNode* last_node;
 
-        // Percorre lista encadeada até o fim
         do{
-            last_entry = cur_entry;
-            cur_entry = cur_entry->next;
-        }while (cur_entry != NULL);
+            last_node = current_node;
+            current_node = current_node->next;
+        }while (current_node != NULL);
 
-        // Adiciona a nova entrada ao fim da lista
-        last_entry->next = new_entry;
-
+        last_node->next = new_node;
+    } else {
+        bucket->nodes = new_node;
     }
-    else{
-        bucket->entries = new_entry;
-    }
-
 }
 
-// Verifica se a chave já existe em uma tabela dada
-int is_key_in_table(Table* table, char* key){
-    TableEntryValue value = get_table_value_by_key(table, key);
-    if (value.symbol_nature == SYMBOL_NATURE_NON_EXISTENT){
-        return 0;
-    }
-    return 1;
+int key_exists_in_table(Table* table, char* key){
+    TableEntry entry = get_entry_by_key(table, key);
+    return entry.nature != NATURE_NON_EXISTENT;
 }
 
 // Verifica se o símbolo já foi declarado nas tabelas da pilhas
-// (percorre do topo ao fim da pilha)
-void check_symbol_declared(TableEntryValue value){
-    
-    char* key = value.valor_lexico.token_val;
-    TableEntryValue found = get_symbol_from_stack_by_key(key);
-    if(found.symbol_nature != SYMBOL_NATURE_NON_EXISTENT){
-        printf("Erro semântico:\n\t Símbolo \"%s\" (linha %d) foi previamente declarado (linha %d)\n", key, value.line_number, found.line_number);
+void verify_declaration(TableEntry entry){
+    char* key = entry.lex_val.token_val;
+    TableEntry found = find_in_stack(key);
+    if(found.nature != NATURE_NON_EXISTENT){
+        printf("Erro semântico encontrado na linha %d: Símbolo \"%s\" foi declarado anteriormente na linha %d.\n", entry.line, key, found.line);
         exit(ERR_DECLARED);
     }
 }
 
-TableEntryValue get_symbol_from_stack_by_key(char* key){
-    // Percorre a pilha
+TableEntry find_in_stack(char* key){
     TableStack* stack_top = globalTableStack;
-    TableEntryValue value;
+    TableEntry entry;
 
     do{
-        value = get_table_value_by_key(stack_top->table, key);
-        stack_top = stack_top->next_item;
-    
-    }while((stack_top != NULL) && (value.symbol_nature == SYMBOL_NATURE_NON_EXISTENT));
+        entry = get_entry_by_key(stack_top->table, key);
+        stack_top = stack_top->next;
+    }while((stack_top != NULL) && (entry.nature == NATURE_NON_EXISTENT));
 
-    return value;
+    return entry;
 }
 
-Table* get_table_from_stack_with_matching_key(char* key){
-    // Percorre a pilha
+Table* get_table_with_key_in_stack(char* key){
     TableStack* stack_top = globalTableStack;
 
-    while(stack_top != NULL && is_key_in_table(stack_top->table, key)){
-        stack_top = stack_top->next_item;
+    while(stack_top != NULL && key_exists_in_table(stack_top->table, key)){
+        stack_top = stack_top->next;
     }
-
     return stack_top->table;
 }
 
-//////////////////////////////////////////////////////////////
-
-//          IMPRESSÃO E DEBUG
-
-//////////////////////////////////////////////////////////////
-
-void print_global_table_stack(int verbose)
+// Print.
+void display_global_stack(int verbose)
 {
     printf("\n====================\n");
 
-    int i;
     TableStack* stack_top = globalTableStack;
 
     do{
         printf("Scope ID %p\n", stack_top);
-        if(verbose) print_table(stack_top->table);
-        stack_top = stack_top->next_item;
+        if(verbose) display_table(stack_top->table);
+        stack_top = stack_top->next;
     }while(stack_top != NULL);
 
     printf("====================\n");
 }
 
-void print_table(Table* table){
+void display_table(Table* table){
     printf("====================\n");
-    int i;
-    for(i=0; i < N_TABLE_BUCKETS; i++){
+    for(int i = 0; i < TABLE_BUCKET_COUNT; i++){
         TableBucket bucket = table->buckets[i];
-        print_bucket(&bucket);
+        display_bucket(&bucket);
     }
     printf("====================\n");
 }
 
-void print_bucket(TableBucket* bucket){
-    TableEntry* entry = bucket->entries;
-    //printf("bucket %d\n", bucket->n);
+void display_bucket(TableBucket* bucket){
+    TableNode* node = bucket->nodes;
 
-    while(entry != NULL){
-        print_entry(entry);
-        entry = entry->next;
+    while(node != NULL){
+        display_node(node);
+        node = node->next;
     }
 }
 
-void print_entry(TableEntry* entry){
-    printf("Key %s\t", entry->key);
-    print_entry_value(entry->value);
+void display_node(TableNode* node){
+    printf("Key %s\t", node->identifier);
+    display_entry(node->entry);
 }
 
-void print_entry_value(TableEntryValue value){
-    printValor_lexico(value.valor_lexico);
+void display_entry(TableEntry entry){
+    printValor_lexico(entry.lex_val);
 }
 
-DataType infer_type_from_identifier(Valor_lexico identifier){
-    TableEntryValue value = get_symbol_from_stack_by_key(identifier.token_val);
-    if(value.symbol_nature == SYMBOL_NATURE_NON_EXISTENT){
-        printf("Erro semântico: O identificador \"%s\" (linha %d) não foi declarado nesse escopo\n", 
-        identifier.token_val, identifier.line_number
+DataType get_type_from_identifier(Valor_lexico identifier){
+    TableEntry entry = find_in_stack(identifier.token_val);
+    if(entry.nature == NATURE_NON_EXISTENT){
+        printf("Erro semântico encontrado na linha %d: O identificador \"%s\" não foi declarado nesse escopo.\n", 
+        identifier.line_number, identifier.token_val
         );
         exit(ERR_UNDECLARED);
     }
-
-    return value.data_type;
+    return entry.type;
 }
 
-void check_identifier_is_variable(Valor_lexico identifier){
-    TableEntryValue value = get_symbol_from_stack_by_key(identifier.token_val);
-    if(value.symbol_nature != SYMBOL_NATURE_IDENTIFIER){
-        printf("Erro semântico: O identificador \"%s\" (linha %d) foi usado como variável, mas foi declarado como função (linha %d)\n", 
-        identifier.token_val, identifier.line_number, value.line_number
+void validate_variable_identifier(Valor_lexico identifier){
+    TableEntry entry = find_in_stack(identifier.token_val);
+    if(entry.nature != NATURE_IDENTIFIER){
+        printf("Erro semântico encontrado na linha %d: O identificador \"%s\" foi usado como variável, mas foi declarado como função na linha %d.\n", 
+        identifier.line_number, identifier.token_val, entry.line
         );
         exit(ERR_FUNCTION);
     }
 }
 
-void check_identifier_is_function(Valor_lexico identifier){
-    TableEntryValue value = get_symbol_from_stack_by_key(identifier.token_val);
-    if(value.symbol_nature != SYMBOL_NATURE_FUNCTION){
-        printf("Erro semântico: O identificador \"%s\" (linha %d) foi usado como função, mas foi declarado como variável (linha %d)\n", 
-        identifier.token_val, identifier.line_number, value.line_number
+void validate_function_identifier(Valor_lexico identifier){
+    TableEntry entry = find_in_stack(identifier.token_val);
+    if(entry.nature != NATURE_FUNCTION){
+        printf("Erro semântico encontrado na linha %d: O identificador \"%s\" foi usado como função, mas foi declarado como variável na linha %d.\n", 
+        identifier.line_number, identifier.token_val, entry.line
         );
         exit(ERR_FUNCTION);
     }

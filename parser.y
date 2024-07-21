@@ -14,7 +14,7 @@ int yylex(void);
 void yyerror (char const *message);
 extern Node* arvore;
 
-DataType declared_type = DATA_TYPE_UNDECLARED; // O tipo atualmente declarado
+DataType declared_type = TYPE_UNDECLARED; // O tipo atualmente declarado
 Node* mainFunctionNode = NULL;
 
 %}
@@ -24,7 +24,7 @@ Node* mainFunctionNode = NULL;
     struct Node* node;
     char* ast_token;
     DataType data_type;
-    SymbolNature symbol_nature;
+    Nature nature;
 }
 
 %define parse.error verbose
@@ -129,20 +129,20 @@ global_vars_declaration: type ident_list ','
     $$ = NULL;
     remove_node($2);
 
-    declared_type = DATA_TYPE_UNDECLARED;
+    declared_type = TYPE_UNDECLARED;
 }
 ident_list: TK_IDENTIFICADOR ';' ident_list
 {
     $$ = NULL;
-    TableEntryValue value = create_table_entry_value(SYMBOL_NATURE_IDENTIFIER, declared_type, $1);
-    add_symbol_value_to_global_table_stack(value);
+    TableEntry value = create_table_entry(NATURE_IDENTIFIER, declared_type, $1);
+    add_entry_to_global_stack(value);
 }
 
 | TK_IDENTIFICADOR
 {
     $$ = NULL;
-    TableEntryValue value = create_table_entry_value(SYMBOL_NATURE_IDENTIFIER, declared_type, $1);
-    add_symbol_value_to_global_table_stack(value);
+    TableEntry value = create_table_entry(NATURE_IDENTIFIER, declared_type, $1);
+    add_entry_to_global_stack(value);
 };
 
 // -- Funções --
@@ -158,8 +158,8 @@ function: header body
 // Cabeçalho da função. Podendo conter uma lista de parametros ou nenhum parametro.
 header: function_arguments TK_OC_OR type '/' TK_IDENTIFICADOR 
 {
-    TableEntryValue value = create_table_entry_value(SYMBOL_NATURE_FUNCTION, declared_type, $5);
-    add_symbol_value_to_below_global_table_stack(value);
+    TableEntry value = create_table_entry(NATURE_FUNCTION, declared_type, $5);
+    add_entry_to_lower_stack(value);
 
     $$ = create_node_valor_lexico($5, $3);
 }
@@ -173,6 +173,11 @@ parameters_list: parameter ';' parameters_list
 };
 parameter: type TK_IDENTIFICADOR{
     $$ = NULL;
+    
+     // Adiciona identificador à tabela de tipos
+    TableEntry value = create_table_entry(NATURE_IDENTIFIER, declared_type, $2);
+    add_entry_to_global_stack(value);
+
     freeValor_lexico($2);
 };
 
@@ -184,15 +189,14 @@ body: command_block
 
 function_argument_init: '('
 {
-    add_table_to_global_stack(create_table());
+    push_table_to_global_stack(create_table());
 }
 
 function_arguments: function_argument_init ')'
 {
     $$ = NULL;
 };
-
-function_arguments: function_argument_init parameters_list ')'
+| function_argument_init parameters_list ')'
 {
     $$ = NULL;
 };
@@ -249,8 +253,8 @@ command: command_block ','
 };
 attribution_command: TK_IDENTIFICADOR '=' expression
 {
-    DataType type = infer_type_from_identifier($1);
-    check_identifier_is_variable($1);
+    DataType type = get_type_from_identifier($1);
+    validate_variable_identifier($1);
     
     $$ = create_node_token($2, type);
     add_child($$, create_node_valor_lexico($1, type));
@@ -258,16 +262,16 @@ attribution_command: TK_IDENTIFICADOR '=' expression
 };
 function_call: TK_IDENTIFICADOR '(' arguments ')'
 {
-    DataType type = infer_type_from_identifier($1);
-    check_identifier_is_function($1);
+    DataType type = get_type_from_identifier($1);
+    validate_function_identifier($1);
 
     $$ = create_node_function($1, type);
     add_child($$, $3);
 } 
 | TK_IDENTIFICADOR '('')'
 {
-    DataType type = infer_type_from_identifier($1);
-    check_identifier_is_function($1);
+    DataType type = get_type_from_identifier($1);
+    validate_function_identifier($1);
 
     $$ = create_node_function($1, type);
 };
@@ -451,7 +455,7 @@ negation_expression: negation_expression '!'
 }
 | '!'
 {
-    DataType declared_exclamation = DATA_TYPE_PLACEHOLDER;
+    DataType declared_exclamation = TYPE_PLACEHOLDER;
     $$ = create_node_token($1, declared_exclamation);
 };
 minus_expressison: minus_expressison '-' 
@@ -461,7 +465,7 @@ minus_expressison: minus_expressison '-'
 }
 | '-' 
 {
-    DataType declared_minus = DATA_TYPE_PLACEHOLDER;
+    DataType declared_minus = TYPE_PLACEHOLDER;
     $$ = create_node_token($1, declared_minus);
 };
 
@@ -475,8 +479,8 @@ expression0: operands
 };
 operands: TK_IDENTIFICADOR 
 {
-    DataType type = infer_type_from_identifier($1);
-    check_identifier_is_variable($1);
+    DataType type = get_type_from_identifier($1);
+    validate_variable_identifier($1);
 
     $$ = create_node_valor_lexico($1, type);
 }
@@ -492,40 +496,40 @@ operands: TK_IDENTIFICADOR
 // -- Tipos --
 type: TK_PR_INT
 {
-    declared_type = DATA_TYPE_INT;
-    $$ = DATA_TYPE_INT;
+    declared_type = TYPE_INT;
+    $$ = TYPE_INT;
 } 
 | TK_PR_FLOAT 
 {
-    declared_type = DATA_TYPE_FLOAT;
-    $$ = DATA_TYPE_FLOAT;
+    declared_type = TYPE_FLOAT;
+    $$ = TYPE_FLOAT;
 }
 | TK_PR_BOOL
 {
-    declared_type = DATA_TYPE_BOOL;
-    $$ = DATA_TYPE_BOOL;
+    declared_type = TYPE_BOOL;
+    $$ = TYPE_BOOL;
 };
 
 // -- Literais --
 literal: TK_LIT_INT
 {
-    $$ = create_node_valor_lexico($1, DATA_TYPE_INT);
+    $$ = create_node_valor_lexico($1, TYPE_INT);
 } 
 | TK_LIT_FLOAT 
 {
-    $$ = create_node_valor_lexico($1, DATA_TYPE_FLOAT);
+    $$ = create_node_valor_lexico($1, TYPE_FLOAT);
 }
 | TK_LIT_TRUE 
 {
-    $$ = create_node_valor_lexico($1, DATA_TYPE_BOOL);
-    TableEntryValue value = create_table_entry_value(SYMBOL_NATURE_LITERAL, DATA_TYPE_BOOL, $1);
-    add_symbol_value_to_global_table_stack(value);
+    $$ = create_node_valor_lexico($1, TYPE_BOOL);
+    TableEntry value = create_table_entry(NATURE_LITERAL, TYPE_BOOL, $1);
+    add_entry_to_global_stack(value);
 }
 | TK_LIT_FALSE
 {
-    $$ = create_node_valor_lexico($1, DATA_TYPE_BOOL);
-    TableEntryValue value = create_table_entry_value(SYMBOL_NATURE_LITERAL, DATA_TYPE_BOOL, $1);
-    add_symbol_value_to_global_table_stack(value);
+    $$ = create_node_valor_lexico($1, TYPE_BOOL);
+    TableEntry value = create_table_entry(NATURE_LITERAL, TYPE_BOOL, $1);
+    add_entry_to_global_stack(value);
 };
 %%
 
@@ -533,4 +537,4 @@ literal: TK_LIT_INT
 void yyerror(char const *message)
 {
     printf("Erro Sintático encontrado na linha %d: %s\n", get_line_number(), message);
-}
+} 

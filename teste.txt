@@ -1,10 +1,4 @@
-int va,
-int vc,
-(float k; int l)|int/functionteste
-{
+() | int / f {
   int a,
-  {
-    int va,
-    a = functionteste,
-  }
+float a,
 }

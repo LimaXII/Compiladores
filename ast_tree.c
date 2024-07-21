@@ -130,7 +130,7 @@ DataType infer_type_from_node(Node* node){
 }
 
 DataType infer_type_from_nodes(Node* node1, Node* node2){
-    DataType inferred_type = infer_type_from_types(node1->data_type, node2->data_type);
+    DataType inferred_type = determine_data_type(node1->data_type, node2->data_type);
 
     return inferred_type;
 }

@@ -1,3 +1,7 @@
+/* ======= GRUPO J ======= */
+/* Luccas da Silva Lima 00324683 */
+/* Matheus Almeida da Silva 00316326 */
+
 #include <stdio.h>
 #include "table.h"
 extern int yyparse(void);
@@ -7,14 +11,14 @@ TableStack* globalTableStack;
 void exporta (void *arvore);
 int main (int argc, char **argv)
 {
-  init_global_symbol_stack();
+  initialize_global_stack();
   int ret = yyparse(); 
 
   exporta (arvore);
   yylex_destroy();
 
   printf("Final stack state:\n");
-  print_global_table_stack(100);
+  display_global_stack(100);
 
   free_table_stack(globalTableStack);
   return ret;
