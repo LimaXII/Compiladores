@@ -174,7 +174,7 @@ parameters_list: parameter ';' parameters_list
 parameter: type TK_IDENTIFICADOR{
     $$ = NULL;
     
-     // Adiciona identificador à tabela de tipos
+    // Adiciona identificador à tabela de tipos
     TableEntry value = create_table_entry(NATURE_IDENTIFIER, declared_type, $2);
     add_entry_to_global_stack(value);
 
@@ -182,10 +182,14 @@ parameter: type TK_IDENTIFICADOR{
 };
 
 // Corpo da função. Contendo um bloco de comandos.
-body: command_block
+body: '{' simple_command_list '}'
 {
-    $$ = $1;
-};
+    $$ = $2;
+}
+| '{''}'
+{
+    $$ = NULL;
+}
 
 function_argument_init: '('
 {
@@ -201,14 +205,25 @@ function_arguments: function_argument_init ')'
     $$ = NULL;
 };
 
-command_block: '{' simple_command_list '}' 
+command_block_init: '{'
+{  
+    push_table_to_global_stack(create_table());
+};
+
+command_block_end: '}'
 {
-    $$ = $2;
-}
-| '{''}'
+    pop_global_stack();
+};
+
+command_block: command_block_init command_block_end
 {
     $$ = NULL;
+}
+| command_block_init simple_command_list command_block_end 
+{
+    $$ = $2;
 };
+
 simple_command_list: command simple_command_list
 {
     if ($1)

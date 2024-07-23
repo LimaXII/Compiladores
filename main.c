@@ -14,7 +14,7 @@ int main (int argc, char **argv)
   initialize_global_stack();
   int ret = yyparse(); 
 
-  exporta (arvore);
+  // exporta (arvore);
   yylex_destroy();
 
   printf("Final stack state:\n");

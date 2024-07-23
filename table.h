@@ -100,6 +100,7 @@ void free_table_stack(TableStack* stack);
 TableEntry get_empty_table_entry();
 TableEntry get_entry_by_key(Table* table, char* key);
 TableEntry find_in_stack(char* key);
+TableEntry find_in_table(char* key, int is_function);
 size_t fnv1a_hash(size_t capacity, char* key);
 int compare_keys(TableNode* node, char* key);
 
