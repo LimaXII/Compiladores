@@ -238,11 +238,30 @@ int key_exists_in_table(Table* table, char* key){
 // Verifica se o símbolo já foi declarado nas tabelas da pilhas
 void verify_declaration(TableEntry entry){
     char* key = entry.lex_val.token_val;
-    TableEntry found = find_in_stack(key);
+    TableEntry found;
+    if (entry.nature == NATURE_FUNCTION){
+        found = find_in_table(key, 1);
+    }
+    else{
+        found = find_in_table(key, 0);
+    }
     if(found.nature != NATURE_NON_EXISTENT){
         printf("Erro semântico encontrado na linha %d: Símbolo \"%s\" foi declarado anteriormente na linha %d.\n", entry.line, key, found.line);
         exit(ERR_DECLARED);
     }
+}
+
+TableEntry find_in_table(char* key, int is_function){
+    TableStack* stack_top = globalTableStack;
+    TableEntry entry;
+
+    if (is_function){
+        entry = get_entry_by_key(stack_top->next->table, key);
+    }
+    else{
+        entry = get_entry_by_key(stack_top->table, key);
+    }   
+    return entry;
 }
 
 TableEntry find_in_stack(char* key){
@@ -336,6 +355,6 @@ void validate_function_identifier(Valor_lexico identifier){
         printf("Erro semântico encontrado na linha %d: O identificador \"%s\" foi usado como função, mas foi declarado como variável na linha %d.\n", 
         identifier.line_number, identifier.token_val, entry.line
         );
-        exit(ERR_FUNCTION);
+        exit(ERR_VARIABLE);
     }
 }
