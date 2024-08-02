@@ -6,6 +6,7 @@
 #define AST_TREE_H
 #include "valor_lexico.h"
 #include "table.h"
+#include "iloc.h"
 
 // Definição da estrutura Node
 typedef struct Node {
@@ -14,6 +15,7 @@ typedef struct Node {
     struct Node** children;                 // Ponteiro de ponteiro para o nodo filho.
     struct Node* daddy;                     // Ponteiro para o nodo pai.
     int child_count;                        // Para contar quantos filhos tem.
+    struct IlocCodeList* iloc_code_list;
 } Node;
 
 // Declarações das funções para manipulação da árvore

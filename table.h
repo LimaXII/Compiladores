@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include "valor_lexico.h"
 #include "errors.h"
@@ -40,6 +41,8 @@ typedef struct TableEntry
     Nature nature;
     DataType type;
     Valor_lexico lex_val;
+    bool isGlobal;
+    int offset;
 } TableEntry;
 
 // Entrada na tabela de símbolos
@@ -65,13 +68,16 @@ typedef struct Table
 {
     int bucket_count;
     TableBucket* buckets;
+    int last_offset;
 } Table;
 
 // Um elemento da pilha de tabelas de símbolos
 typedef struct TableStack
 {
     Table* table;
-    struct TableStack* next;    
+    struct TableStack* next;
+    bool isGlobal;
+    int last_offset;    
 } TableStack;
 
 extern TableStack* globalTableStack;
@@ -108,7 +114,7 @@ int compare_keys(TableNode* node, char* key);
 
 void add_entry_to_global_stack(TableEntry entry);
 void add_entry_to_lower_stack(TableEntry entry);
-void add_entry_to_table(Table* table, TableEntry entry);
+void add_entry_to_table(Table* table, TableEntry entry, bool isGlobal);
 
 // Verifica se a chave já existe em uma tabela dada
 int key_exists_in_table(Table* table, char* key);

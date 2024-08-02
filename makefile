@@ -8,7 +8,7 @@ LDIR = ./
 _OBJ = main.o lex.yy.o parser.tab.o valor_lexico.o ast_tree.o table.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
-all: etapa4
+all: etapa5
 
 # Comando do bison para gerar o parser.tab.c
 $(ODIR)/parser.tab.c $(ODIR)/parser.tab.h: parser.y
@@ -36,11 +36,11 @@ $(ODIR)/main.o: main.c $(ODIR)/parser.tab.h
 $(ODIR)/table.o: table.c table.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-etapa4: $(OBJ)
+etapa5: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 .PHONY: clean
 
 # Remove todos os arquivos necessários.
 clean:
-	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ etapa4 $(ODIR)/lex.yy.c $(ODIR)/parser.tab.c $(ODIR)/parser.tab.h table_test
+	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ etapa5 $(ODIR)/lex.yy.c $(ODIR)/parser.tab.c $(ODIR)/parser.tab.h table_test

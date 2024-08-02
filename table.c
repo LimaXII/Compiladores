@@ -37,6 +37,8 @@ void initialize_global_stack()
 {
     globalTableStack = create_table_stack();
     globalTableStack->table = create_table();
+    globalTableStack->last_offset = 0;
+    globalTableStack->isGlobal = true;
 }
 
 void push_table_to_global_stack(Table* table)
@@ -44,7 +46,14 @@ void push_table_to_global_stack(Table* table)
     TableStack* new_stack_frame = create_table_stack();
     new_stack_frame->next = globalTableStack;
     new_stack_frame->table = table;
-    globalTableStack = new_stack_frame; 
+    globalTableStack = new_stack_frame;
+
+    if(globalTableStack->isGlobal){
+        new_stack_frame->last_offset = 0;
+    } else {
+        table->last_offset = globalTableStack->last_offset;
+        new_stack_frame->last_offset = globalTableStack->last_offset;
+    }
 }
 
 void pop_global_stack()
@@ -76,9 +85,11 @@ TableStack* create_table_stack()
 {
     TableStack* stack = malloc(sizeof(TableStack));
     if(!stack) return NULL;
-
     stack->table = NULL;
     stack->next = NULL;
+    stack->isGlobal = false;
+    stack->last_offset = 0;
+
     return stack;
 }
 
@@ -90,6 +101,7 @@ Table* create_table()
 
     table->bucket_count = TABLE_BUCKET_COUNT;
     table->buckets = calloc(TABLE_BUCKET_COUNT, sizeof(TableBucket));
+    table->last_offset = 0;
     
     for(int i = 0; i < TABLE_BUCKET_COUNT; i++){
         table->buckets[i].index = i;
@@ -193,17 +205,26 @@ int compare_keys(TableNode* node, char* key)
 
 // Operações com a Pilha.
 void add_entry_to_global_stack(TableEntry entry){
-    add_entry_to_table(globalTableStack->table, entry);
+    add_entry_to_table(globalTableStack->table, entry, true);
 }
 
 void add_entry_to_lower_stack(TableEntry entry){
-    add_entry_to_table(globalTableStack->next->table, entry);
+    add_entry_to_table(globalTableStack->next->table, entry, false);
 }
 
 // Adiciona um símbolo a uma tabela de símbolos
-void add_entry_to_table(Table* table, TableEntry entry){
+void add_entry_to_table(Table* table, TableEntry entry, bool isGlobal){
     if (entry.nature != NATURE_LITERAL){
         verify_declaration(entry);
+    }
+
+    entry.isGlobal = isGlobal;
+    if (entry.nature == NATURE_LITERAL || entry.nature == NATURE_FUNCTION){
+        entry.offset = -1;
+    }
+    else {
+        entry.offset = table->last_offset;
+        table->last_offset += 4;
     }
 
     char* key = strdup(entry.lex_val.token_val);
