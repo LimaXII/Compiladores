@@ -54,7 +54,6 @@ typedef struct TableNode
 } TableNode;
 
 // Um bucket da tabela de símbolos (contém todas entradas que mapeiam para um mesmo índice)
-// Um bucket da tabela de símbolos (contém todas entradas que mapeiam para um mesmo índice)
 typedef struct TableBucket
 {
     int index;

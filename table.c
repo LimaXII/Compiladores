@@ -46,7 +46,6 @@ void push_table_to_global_stack(Table* table)
     TableStack* new_stack_frame = create_table_stack();
     new_stack_frame->next = globalTableStack;
     new_stack_frame->table = table;
-    globalTableStack = new_stack_frame;
 
     if(globalTableStack->isGlobal){
         new_stack_frame->last_offset = 0;
@@ -54,6 +53,8 @@ void push_table_to_global_stack(Table* table)
         table->last_offset = globalTableStack->last_offset;
         new_stack_frame->last_offset = globalTableStack->last_offset;
     }
+
+    globalTableStack = new_stack_frame;
 }
 
 void pop_global_stack()
@@ -346,6 +347,8 @@ void display_node(TableNode* node){
 }
 
 void display_entry(TableEntry entry){
+    printf("Is Global: %d\t", entry.isGlobal);
+    printf("Offset: %d\t", entry.offset);
     printValor_lexico(entry.lex_val);
 }
 
