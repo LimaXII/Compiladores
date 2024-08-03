@@ -63,24 +63,6 @@ void pop_global_stack()
     globalTableStack = globalTableStack->next;
 }
 
-void transfer_to_lower_stack()
-{
-    if(globalTableStack->next == NULL){
-        printf("Erro ao copiar os símbolos para tabela abaixo. Não existe tabela abaixo, a atual é a global. \n");
-        exit(1);
-    }
-
-    for(int i = 0; i < TABLE_BUCKET_COUNT; i++){
-        TableBucket* bucket = &globalTableStack->table->buckets[i];
-        TableNode* node = bucket->nodes;
-
-        while(node != NULL){
-            add_entry_to_table(globalTableStack->next->table, node->entry);
-            node = node->next;
-        }
-    }
-}
-
 // Cria uma nova pilha.
 TableStack* create_table_stack()
 {

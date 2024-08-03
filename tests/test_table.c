@@ -3,9 +3,9 @@
 #include <string.h>
 #include <setjmp.h>
 #include <errno.h>
-#include "table.h"
-#include "valor_lexico.h"
-#include "errors.h"
+#include "../table.h"
+#include "../valor_lexico.h"
+#include "../errors.h"
 
 // Variável global para manusear o ambiente de longjmp/setjmp
 jmp_buf env;

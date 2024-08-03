@@ -84,7 +84,6 @@ extern TableStack* globalTableStack;
 void initialize_global_stack();
 void push_table_to_global_stack(Table* table);
 void pop_global_stack();
-void transfer_to_lower_stack();
 
 // Criação de uma nova pilha de tabela de símbolos
 TableStack* create_table_stack();

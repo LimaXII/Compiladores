@@ -31,10 +31,10 @@ typedef enum {
 
 typedef struct IlocCode {
     Opcode opcode;
-    int t1;
-    int t2;
-    int t3;
-    int t4;
+    int t1; // temporario de entrada 1
+    int t2; // temporario de entrada 2
+    int t3; // temporario de saida 1
+    int t4; // temporario de saida 2
 } IlocCode;
 
 typedef struct IlocCodeList {
