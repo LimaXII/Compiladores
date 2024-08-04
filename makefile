@@ -4,8 +4,9 @@ CFLAGS = -I$(IDIR)
 
 ODIR = ./
 LDIR = ./
+TESTDIR = ./test/
 
-_OBJ = main.o lex.yy.o parser.tab.o valor_lexico.o ast_tree.o table.o
+_OBJ = main.o lex.yy.o parser.tab.o valor_lexico.o ast_tree.o table.o iloc.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 all: etapa5
@@ -36,6 +37,10 @@ $(ODIR)/main.o: main.c $(ODIR)/parser.tab.h
 $(ODIR)/table.o: table.c table.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
+# Regra para compilar iloc.o
+$(ODIR)/iloc.o: iloc.c iloc.h
+	$(CC) -c -o $@ $< $(CFLAGS)
+
 etapa5: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
@@ -43,4 +48,4 @@ etapa5: $(OBJ)
 
 # Remove todos os arquivos necessários.
 clean:
-	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ etapa5 $(ODIR)/lex.yy.c $(ODIR)/parser.tab.c $(ODIR)/parser.tab.h table_test
+	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ etapa5 $(ODIR)/lex.yy.c $(ODIR)/parser.tab.c $(ODIR)/parser.tab.h

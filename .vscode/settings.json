@@ -6,6 +6,7 @@
         "errors.h": "c",
         "table.h": "c",
         "string.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "iloc.h": "c"
     }
 }
