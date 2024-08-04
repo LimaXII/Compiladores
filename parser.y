@@ -296,8 +296,6 @@ attribution_command: TK_IDENTIFICADOR '=' expression
 
     $$->iloc_code_list = concatenate_code($$->iloc_code_list, $3->iloc_code_list);
     TableEntry symbol = find_in_stack($1.token_val);
-    // DEBUG ETAPA 5
-    display_entry(symbol);
     int address = symbol.offset;
     int t1 = $3->out_r;
 

@@ -1,11 +1,14 @@
-int a,
+int x,
+int y,
+int z,
 () | int / main{
-    int c; b,
+    int c; b; d,
 
-    a = 1 + 2,
+    x = 1 + 2,
     c = 3 + 4,
 
     b = 0,
+    d = 9,
 
-    c = a + b,
+    c = x + b + d,
 }
