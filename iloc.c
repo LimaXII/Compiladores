@@ -1,3 +1,7 @@
+/* ======= GRUPO J ======= */
+/* Luccas da Silva Lima 00324683 */
+/* Matheus Almeida da Silva 00316326 */
+
 #include "iloc.h"
 #include <string.h>
 
