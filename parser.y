@@ -7,6 +7,7 @@
 #include "valor_lexico.h"
 #include "ast_tree.h"
 #include "table.h"
+#include "iloc.h"
 
 // Importa as funções necessárias.
 int get_line_number();
@@ -105,6 +106,9 @@ elements_list: element elements_list
     if ($1){
         $$ = $1;
         add_child($$, $2);
+        if($2){
+            $$->iloc_code_list = concatenate_code($$->iloc_code_list, $2->iloc_code_list); 
+        }
     }
     else{
         $$ = $2;
@@ -153,6 +157,12 @@ function: header body
         add_child($$, $2);
     }
     pop_global_stack();
+
+    if ($2)
+        $$->iloc_code_list = $2->iloc_code_list;
+
+    if (strncmp($1->valor_lexico.token_val, "main", 4) == 0)
+        mainFunctionNode = $$;
 };
 
 // Cabeçalho da função. Podendo conter uma lista de parametros ou nenhum parametro.
@@ -205,6 +215,7 @@ function_arguments: function_argument_init ')'
     $$ = NULL;
 };
 
+// -- Blocos Comandos --
 command_block_init: '{'
 {  
     push_table_to_global_stack(create_table());
@@ -226,13 +237,18 @@ command_block: command_block_init command_block_end
 
 simple_command_list: command simple_command_list
 {
-    if ($1)
-    {
+    if ($1){
         $$ = $1;
         add_child($$, $2);
+
+        if ($1->iloc_code_list){
+            $1->iloc_code_list = concatenate_code($1->iloc_code_list, $2->iloc_code_list);
+        }
+        else{
+            $$->iloc_code_list = $2->iloc_code_list ;
+        }
     }
-    else
-    {
+    else{
         $$ = $2;
     }
 }
@@ -266,6 +282,9 @@ command: command_block ','
 {
     $$ = $1;
 };
+
+// -------------- ETAPA 5 ------------------------
+// CONSTRUCOES DE LINGUAGEM
 attribution_command: TK_IDENTIFICADOR '=' expression
 {
     DataType type = get_type_from_identifier($1);
@@ -274,6 +293,18 @@ attribution_command: TK_IDENTIFICADOR '=' expression
     $$ = create_node_token($2, type);
     add_child($$, create_node_valor_lexico($1, type));
     add_child($$, $3);
+
+    TableEntry symbol = find_in_stack($1.token_val);
+    int address = symbol.offset;
+    int t1 = $3->out_r;
+
+    if(symbol.isGlobal){
+        gen_code(&($$->iloc_code_list), OP_STOREAI_GLOBAL, t1, -1, address, -1);
+    } else{
+        gen_code(&($$->iloc_code_list), OP_STOREAI_LOCAL, t1, -1, address, -1);
+    }
+
+    $$->iloc_code_list = concatenate_code($$->iloc_code_list, $3->iloc_code_list);
 };
 function_call: TK_IDENTIFICADOR '(' arguments ')'
 {
@@ -301,28 +332,97 @@ control_command: TK_PR_IF '(' expression ')' command_block
 {
     $$ = create_node_token($1, infer_type_from_node($3));
     add_child($$, $3);
+
+    $$->iloc_code_list = concatenate_code($$->iloc_code_list, $3->iloc_code_list);
+    int t1 = $3->out_r;
+    int t2 = gen_temp();
+    int t3 = gen_temp();
+    int labelTrue = gen_label();
+    int labelFalse = gen_label();
+
+    gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t2, -1);
+    gen_code(&($$->iloc_code_list), OP_CMP_NE, t1, t2, t3, -1);
+    gen_code(&($$->iloc_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
+
+    gen_label_code(&($$->iloc_code_list), labelTrue);
+    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+
     if ($5){
         add_child($$, $5);
+        $$->iloc_code_list = concatenate_code($$->iloc_code_list, $5->iloc_code_list);
     }
+    
+    gen_label_code(&($$->iloc_code_list), labelFalse);
+    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+
 }
 | TK_PR_IF '(' expression ')' command_block TK_PR_ELSE command_block 
 {
     $$ = create_node_token($1, infer_type_from_node($3));
     add_child($$, $3);
+    $$->iloc_code_list = concatenate_code($$->iloc_code_list, $3->iloc_code_list);
+    int t1 = $3->out_r;
+    int t2 = gen_temp();
+    int t3 = gen_temp();
+    int labelTrue = gen_label();
+    int labelFalse = gen_label();
+    int labelEnd = gen_label();
+
+    gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t2, -1);
+    gen_code(&($$->iloc_code_list), OP_CMP_NE, t1, t2, t3, -1);
+    gen_code(&($$->iloc_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
+
+    gen_label_code(&($$->iloc_code_list), labelTrue);
+    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+
     if ($5){
         add_child($$, $5);
+        $$->iloc_code_list = concatenate_code($$->iloc_code_list, $5->iloc_code_list);
     }
+    gen_code(&($$->iloc_code_list), OP_JUMPI, labelEnd, -1, -1, -1);
+    gen_label_code(&($$->iloc_code_list), labelFalse);
+    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+
     if ($7){
         add_child($$, $7);
+        $$->iloc_code_list = concatenate_code($$->iloc_code_list, $7->iloc_code_list);
     }
+
+    gen_label_code(&($$->iloc_code_list), labelEnd);
+    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
 }
 | TK_PR_WHILE '(' expression ')' command_block
 {
     $$ = create_node_token($1, infer_type_from_node($3));
     add_child($$, $3);
+
+    int t1 = $3->out_r;
+    int t2 = gen_temp();
+    int t3 = gen_temp();
+    int labelLoop = gen_label();
+    int labelTrue = gen_label();
+    int labelFalse = gen_label();
+
+    gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t2, -1);
+    gen_label_code(&($$->iloc_code_list), labelLoop);
+    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+
+    $$->iloc_code_list = concatenate_code($$->iloc_code_list, $3->iloc_code_list);
+
+    gen_code(&($$->iloc_code_list), OP_CMP_EQ, t1, t2, t3, -1);
+    gen_code(&($$->iloc_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
+
+    gen_label_code(&($$->iloc_code_list), labelTrue);
+    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+
     if ($5){
         add_child($$, $5);
+        $$->iloc_code_list = concatenate_code($$->iloc_code_list, $5->iloc_code_list);
     }
+    gen_code(&($$->iloc_code_list), OP_JUMPI, labelLoop, -1, -1, -1);
+
+    gen_label_code(&($$->iloc_code_list), labelFalse);
+    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
 };
 arguments: expression ';' arguments
 {
@@ -345,6 +445,14 @@ expression7: expression7 TK_OC_OR expression6
     $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
+
+    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    int t1 = $1->out_r;
+    int t2 = $3->out_r;
+    int t3 = gen_temp();
+
+    gen_code(&($$->iloc_code_list), OP_OR, t1, t2, t3, -1);
+    $$->out_r = t3;
 }
 | expression6
 {
@@ -356,6 +464,14 @@ expression6: expression6 TK_OC_AND expression5
     $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
+
+    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    int t1 = $1->out_r;
+    int t2 = $3->out_r;
+    int t3 = gen_temp();
+
+    gen_code(&($$->iloc_code_list), OP_AND, t1, t2, t3, -1);
+    $$->out_r = t3;
 }
 | expression5
 {
@@ -367,12 +483,60 @@ expression5: expression5 TK_OC_EQ expression4
     $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
+
+    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    int t1 = $1->out_r;
+    int t2 = $3->out_r;
+    int t3 = gen_temp();
+    int t4 = gen_temp();
+    int labelTrue = gen_label();
+    int labelFalse = gen_label();
+    int labelEnd = gen_label();
+
+    gen_code(&($$->iloc_code_list), OP_CMP_EQ, t1, t2, t3, -1);
+    gen_code(&($$->iloc_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
+    gen_label_code(&($$->iloc_code_list), labelTrue);
+    gen_code(&($$->iloc_code_list), OP_LOADI, 1, -1, t4, -1);
+
+    gen_code(&($$->iloc_code_list), OP_JUMPI, labelEnd, -1, -1, -1);
+    gen_label_code(&($$->iloc_code_list), labelFalse);
+    gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t4, -1);
+    
+    
+    gen_label_code(&($$->iloc_code_list), labelFalse);
+    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+
+    $$->out_r = t4;
 }
 | expression5 TK_OC_NE expression4 
 {
     $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
+
+    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    int t1 = $1->out_r;
+    int t2 = $3->out_r;
+    int t3 = gen_temp();
+    int t4 = gen_temp();
+    int labelTrue = gen_label();
+    int labelFalse = gen_label();
+    int labelEnd = gen_label();
+
+    gen_code(&($$->iloc_code_list), OP_CMP_NE, t1, t2, t3, -1);
+    gen_code(&($$->iloc_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
+    gen_label_code(&($$->iloc_code_list), labelTrue);
+    gen_code(&($$->iloc_code_list), OP_LOADI, 1, -1, t4, -1);
+
+    gen_code(&($$->iloc_code_list), OP_JUMPI, labelEnd, -1, -1, -1);
+    gen_label_code(&($$->iloc_code_list), labelFalse);
+    gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t4, -1);
+    
+    
+    gen_label_code(&($$->iloc_code_list), labelFalse);
+    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+
+    $$->out_r = t4;
 }
 | expression4
 {
@@ -384,24 +548,120 @@ expression4: expression4 TK_OC_LE expression3
     $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
+
+    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    int t1 = $1->out_r;
+    int t2 = $3->out_r;
+    int t3 = gen_temp();
+    int t4 = gen_temp();
+    int labelTrue = gen_label();
+    int labelFalse = gen_label();
+    int labelEnd = gen_label();
+
+    gen_code(&($$->iloc_code_list), OP_CMP_LE, t1, t2, t3, -1);
+    gen_code(&($$->iloc_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
+    gen_label_code(&($$->iloc_code_list), labelTrue);
+    gen_code(&($$->iloc_code_list), OP_LOADI, 1, -1, t4, -1);
+
+    gen_code(&($$->iloc_code_list), OP_JUMPI, labelEnd, -1, -1, -1);
+    gen_label_code(&($$->iloc_code_list), labelFalse);
+    gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t4, -1);
+    
+    
+    gen_label_code(&($$->iloc_code_list), labelFalse);
+    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+
+    $$->out_r = t4;
 }
 | expression4 TK_OC_GE expression3 
 {
     $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
+
+    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    int t1 = $1->out_r;
+    int t2 = $3->out_r;
+    int t3 = gen_temp();
+    int t4 = gen_temp();
+    int labelTrue = gen_label();
+    int labelFalse = gen_label();
+    int labelEnd = gen_label();
+
+    gen_code(&($$->iloc_code_list), OP_CMP_GE, t1, t2, t3, -1);
+    gen_code(&($$->iloc_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
+    gen_label_code(&($$->iloc_code_list), labelTrue);
+    gen_code(&($$->iloc_code_list), OP_LOADI, 1, -1, t4, -1);
+
+    gen_code(&($$->iloc_code_list), OP_JUMPI, labelEnd, -1, -1, -1);
+    gen_label_code(&($$->iloc_code_list), labelFalse);
+    gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t4, -1);
+    
+    
+    gen_label_code(&($$->iloc_code_list), labelFalse);
+    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+
+    $$->out_r = t4;
 }
 | expression4 '<' expression3 
 {
     $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
+
+    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    int t1 = $1->out_r;
+    int t2 = $3->out_r;
+    int t3 = gen_temp();
+    int t4 = gen_temp();
+    int labelTrue = gen_label();
+    int labelFalse = gen_label();
+    int labelEnd = gen_label();
+
+    gen_code(&($$->iloc_code_list), OP_CMP_LT, t1, t2, t3, -1);
+    gen_code(&($$->iloc_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
+    gen_label_code(&($$->iloc_code_list), labelTrue);
+    gen_code(&($$->iloc_code_list), OP_LOADI, 1, -1, t4, -1);
+
+    gen_code(&($$->iloc_code_list), OP_JUMPI, labelEnd, -1, -1, -1);
+    gen_label_code(&($$->iloc_code_list), labelFalse);
+    gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t4, -1);
+    
+    
+    gen_label_code(&($$->iloc_code_list), labelFalse);
+    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+
+    $$->out_r = t4;
 }
 | expression4 '>' expression3 
 {
     $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
+
+    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    int t1 = $1->out_r;
+    int t2 = $3->out_r;
+    int t3 = gen_temp();
+    int t4 = gen_temp();
+    int labelTrue = gen_label();
+    int labelFalse = gen_label();
+    int labelEnd = gen_label();
+
+    gen_code(&($$->iloc_code_list), OP_CMP_GT, t1, t2, t3, -1);
+    gen_code(&($$->iloc_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
+    gen_label_code(&($$->iloc_code_list), labelTrue);
+    gen_code(&($$->iloc_code_list), OP_LOADI, 1, -1, t4, -1);
+
+    gen_code(&($$->iloc_code_list), OP_JUMPI, labelEnd, -1, -1, -1);
+    gen_label_code(&($$->iloc_code_list), labelFalse);
+    gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t4, -1);
+    
+    
+    gen_label_code(&($$->iloc_code_list), labelFalse);
+    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+
+    $$->out_r = t4;
 }
 | expression3
 {
@@ -413,12 +673,28 @@ expression3: expression3 '+' expression2
     $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
+
+    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    int t1 = $1->out_r;
+    int t2 = $3->out_r;
+    int t3 = gen_temp();
+
+    gen_code(&($$->iloc_code_list), OP_ADD, t1, t2, t3, -1);
+    $$->out_r = t3;
 }
 | expression3 '-' expression2 
 {
     $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
+
+    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    int t1 = $1->out_r;
+    int t2 = $3->out_r;
+    int t3 = gen_temp();
+
+    gen_code(&($$->iloc_code_list), OP_SUB, t1, t2, t3, -1);
+    $$->out_r = t3;
 }
 | expression2
 {
@@ -430,12 +706,28 @@ expression2: expression2 '*' expression1
     $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
+
+    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    int t1 = $1->out_r;
+    int t2 = $3->out_r;
+    int t3 = gen_temp();
+
+    gen_code(&($$->iloc_code_list), OP_MULT, t1, t2, t3, -1);
+    $$->out_r = t3;
 }
 | expression2 '/' expression1 
 {
     $$ = create_node_token($2, infer_type_from_nodes($1, $3));
     add_child($$, $1);
     add_child($$, $3);
+
+    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    int t1 = $1->out_r;
+    int t2 = $3->out_r;
+    int t3 = gen_temp();
+
+    gen_code(&($$->iloc_code_list), OP_DIV, t1, t2, t3, -1);
+    $$->out_r = t3;
 }
 | expression2 '%' expression1 
 {
@@ -452,11 +744,25 @@ expression1: negation_expression expression0
 {
     $$ = $1;
     add_child($$, $2);
+
+    int t1 = $2->out_r;
+    int t2 = gen_temp();
+    gen_code(&($$->iloc_code_list), OP_NEG_LOG, t1, -1, t2, -1);
+
+    $$->iloc_code_list = concatenate_code($$->iloc_code_list, $2->iloc_code_list);
+    $$->out_r = t2;
 }
 |minus_expressison expression0 
 {
     $$ = $1;
     add_child($$, $2);
+
+    int t1 = $2->out_r;
+    int t2 = gen_temp();
+    gen_code(&($$->iloc_code_list), OP_NEG, t1, -1, t2, -1);
+
+    $$->iloc_code_list = concatenate_code($$->iloc_code_list, $2->iloc_code_list);
+    $$->out_r = t2;
 }
 | expression0
 {
@@ -498,6 +804,18 @@ operands: TK_IDENTIFICADOR
     validate_variable_identifier($1);
 
     $$ = create_node_valor_lexico($1, type);
+
+    TableEntry symbol = find_in_stack($1.token_val);
+    int address = symbol.offset;
+    int t = gen_temp();
+
+    if(symbol.isGlobal){
+        gen_code(&($$->iloc_code_list), OP_LOADAI_GLOBAL, address, -1, t, -1);
+    } else{
+        gen_code(&($$->iloc_code_list), OP_LOADAI_LOCAL, address, -1, t, -1);
+    }
+
+    $$->out_r = t;
 }
 | literal 
 {
