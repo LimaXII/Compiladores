@@ -294,6 +294,7 @@ attribution_command: TK_IDENTIFICADOR '=' expression
     add_child($$, create_node_valor_lexico($1, type));
     add_child($$, $3);
 
+    $$->iloc_code_list = concatenate_code($$->iloc_code_list, $3->iloc_code_list);
     TableEntry symbol = find_in_stack($1.token_val);
     int address = symbol.offset;
     int t1 = $3->out_r;
@@ -674,11 +675,13 @@ expression3: expression3 '+' expression2
     add_child($$, $3);
 
     $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+
     int t1 = $1->out_r;
     int t2 = $3->out_r;
     int t3 = gen_temp();
 
     gen_code(&($$->iloc_code_list), OP_ADD, t1, t2, t3, -1);
+    
     $$->out_r = t3;
 }
 | expression3 '-' expression2 
@@ -744,11 +747,11 @@ expression1: negation_expression expression0
     $$ = $1;
     add_child($$, $2);
 
+    $$->iloc_code_list = concatenate_code($$->iloc_code_list, $2->iloc_code_list);
     int t1 = $2->out_r;
     int t2 = gen_temp();
     gen_code(&($$->iloc_code_list), OP_NEG_LOG, t1, -1, t2, -1);
 
-    $$->iloc_code_list = concatenate_code($$->iloc_code_list, $2->iloc_code_list);
     $$->out_r = t2;
 }
 |minus_expressison expression0 
@@ -756,11 +759,11 @@ expression1: negation_expression expression0
     $$ = $1;
     add_child($$, $2);
 
+    $$->iloc_code_list = concatenate_code($$->iloc_code_list, $2->iloc_code_list);
     int t1 = $2->out_r;
     int t2 = gen_temp();
     gen_code(&($$->iloc_code_list), OP_NEG, t1, -1, t2, -1);
 
-    $$->iloc_code_list = concatenate_code($$->iloc_code_list, $2->iloc_code_list);
     $$->out_r = t2;
 }
 | expression0
@@ -846,6 +849,13 @@ type: TK_PR_INT
 literal: TK_LIT_INT
 {
     $$ = create_node_valor_lexico($1, TYPE_INT);
+
+    int value = atoi($1.token_val);
+    int t = gen_temp();
+
+    gen_code(&($$->iloc_code_list), OP_LOADI, value, -1, t, -1);
+
+    $$->out_r = t;
 } 
 | TK_LIT_FLOAT 
 {

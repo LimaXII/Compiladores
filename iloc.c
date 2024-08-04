@@ -18,8 +18,20 @@ void gen_code(IlocCodeList** head, Opcode opcode, int t1, int t2, int t3, int t4
     new_node->iloc_code.t2 = t2;
     new_node->iloc_code.t3 = t3;
     new_node->iloc_code.t4 = t4;
-    new_node->next = *head;
-    *head = new_node;
+    new_node->next = NULL;
+
+    // Se a lista está vazia, o novo nó se torna o início
+    if (*head == NULL) {
+        *head = new_node;
+    } else {
+        // Encontre o último nó da lista
+        IlocCodeList* current = *head;
+        while (current->next != NULL) {
+            current = current->next;
+        }
+        // Adiciona o novo nó ao final da lista
+        current->next = new_node;
+    }
 }
 
 IlocCodeList* concatenate_code(IlocCodeList* head1, IlocCodeList* head2) {

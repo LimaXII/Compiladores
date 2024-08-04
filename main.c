@@ -23,9 +23,9 @@ int main (int argc, char **argv)
   if (mainFunctionNode && mainFunctionNode->iloc_code_list != NULL){
     print_iloc_code_list(mainFunctionNode->iloc_code_list);
   }
-  print_iloc_code_list(arvore->iloc_code_list);
+  //print_iloc_code_list(arvore->iloc_code_list);
   
-  exporta (arvore);
+  //exporta (arvore);
   yylex_destroy();
 
   //printf("Final stack state:\n");
