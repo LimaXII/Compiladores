@@ -16,6 +16,7 @@ typedef struct Node {
     struct Node* daddy;                     // Ponteiro para o nodo pai.
     int child_count;                        // Para contar quantos filhos tem.
     struct IlocCodeList* iloc_code_list;
+    int out_r;
 } Node;
 
 // Declarações das funções para manipulação da árvore
