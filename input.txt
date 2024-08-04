@@ -1,6 +1,11 @@
 int a,
 () | int / main{
-    int c,
+    int c; b,
 
     a = 1 + 2,
+    c = 3 + 4,
+
+    b = 0,
+
+    c = a + b,
 }
