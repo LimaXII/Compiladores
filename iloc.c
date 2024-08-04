@@ -126,6 +126,9 @@ void print_iloc_code_list(IlocCodeList* head) {
             case OP_STOREAI_LOCAL:
                 printf("storeAI r%d => rfp, %d\n", current->iloc_code.t1, current->iloc_code.t3);
                 break;
+            case OP_LABEL:
+                printf("L%d:", current->iloc_code.t1);
+                break;
             default:
                 printf("Instrução desconhecida.\n");
                 break;
@@ -143,4 +146,15 @@ void free_iloc_code_list(IlocCodeList* head) {
         free(current);
         current = next;
     }
+}
+
+void gen_label_code(IlocCodeList** head, int label_num) {
+    IlocCodeList* new_node = (IlocCodeList*)malloc(sizeof(IlocCodeList));
+    new_node->iloc_code.opcode = OP_LABEL;
+    new_node->iloc_code.t1 = label_num;
+    new_node->iloc_code.t2 = -1;
+    new_node->iloc_code.t3 = -1;
+    new_node->iloc_code.t4 = -1;
+    new_node->next = *head;
+    *head = new_node;
 }

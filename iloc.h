@@ -26,7 +26,8 @@ typedef enum {
     OP_LOADAI_GLOBAL,
     OP_LOADAI_LOCAL,
     OP_STOREAI_GLOBAL,
-    OP_STOREAI_LOCAL
+    OP_STOREAI_LOCAL,
+    OP_LABEL
 } Opcode;
 
 typedef struct IlocCode {
@@ -48,5 +49,5 @@ void gen_code(IlocCodeList** head, Opcode opcode, int t1, int t2, int t3, int t4
 IlocCodeList* concatenate_code(IlocCodeList* head1, IlocCodeList* head2);
 void print_iloc_code_list(IlocCodeList* head);
 void free_iloc_code_list(IlocCodeList* head);
-
+void gen_label_code(IlocCodeList** head, int label_num);
 #endif
