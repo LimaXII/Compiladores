@@ -188,11 +188,11 @@ int compare_keys(TableNode* node, char* key)
 
 // Operações com a Pilha.
 void add_entry_to_global_stack(TableEntry entry){
-    add_entry_to_table(globalTableStack->table, entry, true);
+    add_entry_to_table(globalTableStack->table, entry, globalTableStack->isGlobal);
 }
 
 void add_entry_to_lower_stack(TableEntry entry){
-    add_entry_to_table(globalTableStack->next->table, entry, false);
+    add_entry_to_table(globalTableStack->next->table, entry, globalTableStack->next->isGlobal);
 }
 
 // Adiciona um símbolo a uma tabela de símbolos
