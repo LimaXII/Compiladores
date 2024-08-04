@@ -304,7 +304,6 @@ attribution_command: TK_IDENTIFICADOR '=' expression
         gen_code(&($$->iloc_code_list), OP_STOREAI_LOCAL, t1, -1, address, -1);
     }
 
-    $$->iloc_code_list = concatenate_code($$->iloc_code_list, $3->iloc_code_list);
 };
 function_call: TK_IDENTIFICADOR '(' arguments ')'
 {

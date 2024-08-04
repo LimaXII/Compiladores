@@ -1,8 +1,6 @@
-(int i; int j; int k) | int /g{
-}
-() | int / f{
-    int a,
-    int b,
+int a,
+() | int / main{
     int c,
-    g(a; b; c),
+
+    a = 1 + 2,
 }

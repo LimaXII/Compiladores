@@ -1,8 +1,0 @@
-//ERR_DECLARED
-int a,
-() | int / f {
-    return 0,
-}
-int b,
-() | int / f {
-}
