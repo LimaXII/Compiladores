@@ -503,7 +503,7 @@ expression5: expression5 TK_OC_EQ expression4
     gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t4, -1);
     
     
-    gen_label_code(&($$->iloc_code_list), labelFalse);
+    gen_label_code(&($$->iloc_code_list), labelEnd);
     gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
 
     $$->out_r = t4;
@@ -533,7 +533,7 @@ expression5: expression5 TK_OC_EQ expression4
     gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t4, -1);
     
     
-    gen_label_code(&($$->iloc_code_list), labelFalse);
+    gen_label_code(&($$->iloc_code_list), labelEnd);
     gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
 
     $$->out_r = t4;
@@ -568,7 +568,7 @@ expression4: expression4 TK_OC_LE expression3
     gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t4, -1);
     
     
-    gen_label_code(&($$->iloc_code_list), labelFalse);
+    gen_label_code(&($$->iloc_code_list), labelEnd);
     gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
 
     $$->out_r = t4;
@@ -598,7 +598,7 @@ expression4: expression4 TK_OC_LE expression3
     gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t4, -1);
     
     
-    gen_label_code(&($$->iloc_code_list), labelFalse);
+    gen_label_code(&($$->iloc_code_list), labelEnd);
     gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
 
     $$->out_r = t4;
@@ -628,7 +628,7 @@ expression4: expression4 TK_OC_LE expression3
     gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t4, -1);
     
     
-    gen_label_code(&($$->iloc_code_list), labelFalse);
+    gen_label_code(&($$->iloc_code_list), labelEnd);
     gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
 
     $$->out_r = t4;
@@ -658,7 +658,7 @@ expression4: expression4 TK_OC_LE expression3
     gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t4, -1);
     
     
-    gen_label_code(&($$->iloc_code_list), labelFalse);
+    gen_label_code(&($$->iloc_code_list), labelEnd);
     gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
 
     $$->out_r = t4;

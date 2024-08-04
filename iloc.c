@@ -122,10 +122,10 @@ void print_iloc_code_list(IlocCodeList* head) {
                 printf("cmp_LE r%d, r%d -> r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
                 break;
             case OP_CBR:
-                printf("cbr r%d -> l%d, l%d\n", current->iloc_code.t1, current->iloc_code.t3, current->iloc_code.t4);
+                printf("cbr r%d -> L%d, L%d\n", current->iloc_code.t1, current->iloc_code.t3, current->iloc_code.t4);
                 break;
             case OP_JUMPI:
-                printf("jumpI -> l%d\n", current->iloc_code.t1);
+                printf("jumpI -> L%d\n", current->iloc_code.t1);
                 break;
             case OP_LOADI:
                 printf("loadI %d => r%d\n", current->iloc_code.t1, current->iloc_code.t3);
@@ -143,7 +143,7 @@ void print_iloc_code_list(IlocCodeList* head) {
                 printf("storeAI r%d => rfp, %d\n", current->iloc_code.t1, current->iloc_code.t3);
                 break;
             case OP_LABEL:
-                printf("L%d:", current->iloc_code.t1);
+                printf("L%d: ", current->iloc_code.t1);
                 break;
             default:
                 printf("Instrução desconhecida.\n");
@@ -171,6 +171,18 @@ void gen_label_code(IlocCodeList** head, int label_num) {
     new_node->iloc_code.t2 = -1;
     new_node->iloc_code.t3 = -1;
     new_node->iloc_code.t4 = -1;
-    new_node->next = *head;
-    *head = new_node;
+    new_node->next = NULL;
+
+    // Se a lista está vazia, o novo nó se torna o início
+    if (*head == NULL) {
+        *head = new_node;
+    } else {
+        // Encontre o último nó da lista
+        IlocCodeList* current = *head;
+        while (current->next != NULL) {
+            current = current->next;
+        }
+        // Adiciona o novo nó ao final da lista
+        current->next = new_node;
+    }
 }
