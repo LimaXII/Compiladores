@@ -7,7 +7,7 @@ HDIR = ./include
 LDIR = ./
 TESTDIR = ./test
 
-_OBJ = main.o lex.yy.o parser.tab.o valor_lexico.o ast_tree.o table.o iloc.o
+_OBJ = main.o lex.yy.o parser.tab.o valor_lexico.o ast_tree.o table.o asm.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 all: etapa6
@@ -38,8 +38,8 @@ $(ODIR)/main.o: $(ODIR)/main.c $(HDIR)/parser.tab.h
 $(ODIR)/table.o: $(ODIR)/table.c $(HDIR)/table.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-# Regra para compilar iloc.o
-$(ODIR)/iloc.o: $(ODIR)/iloc.c $(HDIR)/iloc.h
+# Regra para compilar asm.o
+$(ODIR)/asm.o: $(ODIR)/asm.c $(HDIR)/asm.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 etapa6: $(OBJ)

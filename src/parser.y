@@ -7,7 +7,7 @@
 #include "valor_lexico.h"
 #include "ast_tree.h"
 #include "table.h"
-#include "iloc.h"
+#include "asm.h"
 
 // Importa as funções necessárias.
 int get_line_number();
@@ -107,7 +107,7 @@ elements_list: element elements_list
         $$ = $1;
         add_child($$, $2);
         if($2){
-            $$->iloc_code_list = concatenate_code($$->iloc_code_list, $2->iloc_code_list); 
+            $$->asm_code_list = concatenate_code($$->asm_code_list, $2->asm_code_list); 
         }
     }
     else{
@@ -159,7 +159,7 @@ function: header body
     pop_global_stack();
 
     if ($2)
-        $$->iloc_code_list = $2->iloc_code_list;
+        $$->asm_code_list = $2->asm_code_list;
 
     if (strncmp($1->valor_lexico.token_val, "main", 4) == 0)
         mainFunctionNode = $$;
@@ -241,11 +241,11 @@ simple_command_list: command simple_command_list
         $$ = $1;
         add_child($$, $2);
 
-        if ($1->iloc_code_list){
-            $1->iloc_code_list = concatenate_code($1->iloc_code_list, $2->iloc_code_list);
+        if ($1->asm_code_list){
+            $1->asm_code_list = concatenate_code($1->asm_code_list, $2->asm_code_list);
         }
         else{
-            $$->iloc_code_list = $2->iloc_code_list ;
+            $$->asm_code_list = $2->asm_code_list ;
         }
     }
     else{
@@ -294,15 +294,15 @@ attribution_command: TK_IDENTIFICADOR '=' expression
     add_child($$, create_node_valor_lexico($1, type));
     add_child($$, $3);
 
-    $$->iloc_code_list = concatenate_code($$->iloc_code_list, $3->iloc_code_list);
+    $$->asm_code_list = concatenate_code($$->asm_code_list, $3->asm_code_list);
     TableEntry symbol = find_in_stack($1.token_val);
     int address = symbol.offset;
     int t1 = $3->out_r;
 
     if(symbol.isGlobal){
-        gen_code(&($$->iloc_code_list), OP_STOREAI_GLOBAL, t1, -1, address, -1);
+        gen_code(&($$->asm_code_list), OP_STOREAI_GLOBAL, t1, -1, address, -1);
     } else{
-        gen_code(&($$->iloc_code_list), OP_STOREAI_LOCAL, t1, -1, address, -1);
+        gen_code(&($$->asm_code_list), OP_STOREAI_LOCAL, t1, -1, address, -1);
     }
 
 };
@@ -326,6 +326,11 @@ return_command: TK_PR_RETURN expression
 {
     $$ = create_node_token($1, infer_type_from_node($2));
     add_child($$, $2);
+
+    $$->asm_code_list = concatenate_code($$->asm_code_list, $2->asm_code_list);
+    int r1 = $2->out_r;   
+
+    gen_code(&($$->asm_code_list), OP_RETURN, r1, -1, -1, -1);
 };
 
 control_command: TK_PR_IF '(' expression ')' command_block 
@@ -333,34 +338,34 @@ control_command: TK_PR_IF '(' expression ')' command_block
     $$ = create_node_token($1, infer_type_from_node($3));
     add_child($$, $3);
 
-    $$->iloc_code_list = concatenate_code($$->iloc_code_list, $3->iloc_code_list);
+    $$->asm_code_list = concatenate_code($$->asm_code_list, $3->asm_code_list);
     int t1 = $3->out_r;
     int t2 = gen_temp();
     int t3 = gen_temp();
     int labelTrue = gen_label();
     int labelFalse = gen_label();
 
-    gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t2, -1);
-    gen_code(&($$->iloc_code_list), OP_CMP_NE, t1, t2, t3, -1);
-    gen_code(&($$->iloc_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
+    gen_code(&($$->asm_code_list), OP_LOADI, 0, -1, t2, -1);
+    gen_code(&($$->asm_code_list), OP_CMP_NE, t1, t2, t3, -1);
+    gen_code(&($$->asm_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
 
-    gen_label_code(&($$->iloc_code_list), labelTrue);
-    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+    gen_label_code(&($$->asm_code_list), labelTrue);
+    gen_code(&($$->asm_code_list), OP_NOP, -1, -1, -1, -1);
 
     if ($5){
         add_child($$, $5);
-        $$->iloc_code_list = concatenate_code($$->iloc_code_list, $5->iloc_code_list);
+        $$->asm_code_list = concatenate_code($$->asm_code_list, $5->asm_code_list);
     }
     
-    gen_label_code(&($$->iloc_code_list), labelFalse);
-    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+    gen_label_code(&($$->asm_code_list), labelFalse);
+    gen_code(&($$->asm_code_list), OP_NOP, -1, -1, -1, -1);
 
 }
 | TK_PR_IF '(' expression ')' command_block TK_PR_ELSE command_block 
 {
     $$ = create_node_token($1, infer_type_from_node($3));
     add_child($$, $3);
-    $$->iloc_code_list = concatenate_code($$->iloc_code_list, $3->iloc_code_list);
+    $$->asm_code_list = concatenate_code($$->asm_code_list, $3->asm_code_list);
     int t1 = $3->out_r;
     int t2 = gen_temp();
     int t3 = gen_temp();
@@ -368,28 +373,28 @@ control_command: TK_PR_IF '(' expression ')' command_block
     int labelFalse = gen_label();
     int labelEnd = gen_label();
 
-    gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t2, -1);
-    gen_code(&($$->iloc_code_list), OP_CMP_NE, t1, t2, t3, -1);
-    gen_code(&($$->iloc_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
+    gen_code(&($$->asm_code_list), OP_LOADI, 0, -1, t2, -1);
+    gen_code(&($$->asm_code_list), OP_CMP_NE, t1, t2, t3, -1);
+    gen_code(&($$->asm_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
 
-    gen_label_code(&($$->iloc_code_list), labelTrue);
-    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+    gen_label_code(&($$->asm_code_list), labelTrue);
+    gen_code(&($$->asm_code_list), OP_NOP, -1, -1, -1, -1);
 
     if ($5){
         add_child($$, $5);
-        $$->iloc_code_list = concatenate_code($$->iloc_code_list, $5->iloc_code_list);
+        $$->asm_code_list = concatenate_code($$->asm_code_list, $5->asm_code_list);
     }
-    gen_code(&($$->iloc_code_list), OP_JUMPI, labelEnd, -1, -1, -1);
-    gen_label_code(&($$->iloc_code_list), labelFalse);
-    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+    gen_code(&($$->asm_code_list), OP_JUMPI, labelEnd, -1, -1, -1);
+    gen_label_code(&($$->asm_code_list), labelFalse);
+    gen_code(&($$->asm_code_list), OP_NOP, -1, -1, -1, -1);
 
     if ($7){
         add_child($$, $7);
-        $$->iloc_code_list = concatenate_code($$->iloc_code_list, $7->iloc_code_list);
+        $$->asm_code_list = concatenate_code($$->asm_code_list, $7->asm_code_list);
     }
 
-    gen_label_code(&($$->iloc_code_list), labelEnd);
-    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+    gen_label_code(&($$->asm_code_list), labelEnd);
+    gen_code(&($$->asm_code_list), OP_NOP, -1, -1, -1, -1);
 }
 | TK_PR_WHILE '(' expression ')' command_block
 {
@@ -403,26 +408,26 @@ control_command: TK_PR_IF '(' expression ')' command_block
     int labelTrue = gen_label();
     int labelFalse = gen_label();
 
-    gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t2, -1);
-    gen_label_code(&($$->iloc_code_list), labelLoop);
-    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+    gen_code(&($$->asm_code_list), OP_LOADI, 0, -1, t2, -1);
+    gen_label_code(&($$->asm_code_list), labelLoop);
+    gen_code(&($$->asm_code_list), OP_NOP, -1, -1, -1, -1);
 
-    $$->iloc_code_list = concatenate_code($$->iloc_code_list, $3->iloc_code_list);
+    $$->asm_code_list = concatenate_code($$->asm_code_list, $3->asm_code_list);
 
-    gen_code(&($$->iloc_code_list), OP_CMP_EQ, t1, t2, t3, -1);
-    gen_code(&($$->iloc_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
+    gen_code(&($$->asm_code_list), OP_CMP_EQ, t1, t2, t3, -1);
+    gen_code(&($$->asm_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
 
-    gen_label_code(&($$->iloc_code_list), labelTrue);
-    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+    gen_label_code(&($$->asm_code_list), labelTrue);
+    gen_code(&($$->asm_code_list), OP_NOP, -1, -1, -1, -1);
 
     if ($5){
         add_child($$, $5);
-        $$->iloc_code_list = concatenate_code($$->iloc_code_list, $5->iloc_code_list);
+        $$->asm_code_list = concatenate_code($$->asm_code_list, $5->asm_code_list);
     }
-    gen_code(&($$->iloc_code_list), OP_JUMPI, labelLoop, -1, -1, -1);
+    gen_code(&($$->asm_code_list), OP_JUMPI, labelLoop, -1, -1, -1);
 
-    gen_label_code(&($$->iloc_code_list), labelFalse);
-    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+    gen_label_code(&($$->asm_code_list), labelFalse);
+    gen_code(&($$->asm_code_list), OP_NOP, -1, -1, -1, -1);
 };
 arguments: expression ';' arguments
 {
@@ -446,12 +451,12 @@ expression7: expression7 TK_OC_OR expression6
     add_child($$, $1);
     add_child($$, $3);
 
-    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    $$->asm_code_list = concatenate_code($1->asm_code_list, $3->asm_code_list);
     int t1 = $1->out_r;
     int t2 = $3->out_r;
     int t3 = gen_temp();
 
-    gen_code(&($$->iloc_code_list), OP_OR, t1, t2, t3, -1);
+    gen_code(&($$->asm_code_list), OP_OR, t1, t2, t3, -1);
     $$->out_r = t3;
 }
 | expression6
@@ -465,12 +470,12 @@ expression6: expression6 TK_OC_AND expression5
     add_child($$, $1);
     add_child($$, $3);
 
-    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    $$->asm_code_list = concatenate_code($1->asm_code_list, $3->asm_code_list);
     int t1 = $1->out_r;
     int t2 = $3->out_r;
     int t3 = gen_temp();
 
-    gen_code(&($$->iloc_code_list), OP_AND, t1, t2, t3, -1);
+    gen_code(&($$->asm_code_list), OP_AND, t1, t2, t3, -1);
     $$->out_r = t3;
 }
 | expression5
@@ -484,7 +489,7 @@ expression5: expression5 TK_OC_EQ expression4
     add_child($$, $1);
     add_child($$, $3);
 
-    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    $$->asm_code_list = concatenate_code($1->asm_code_list, $3->asm_code_list);
     int t1 = $1->out_r;
     int t2 = $3->out_r;
     int t3 = gen_temp();
@@ -493,18 +498,18 @@ expression5: expression5 TK_OC_EQ expression4
     int labelFalse = gen_label();
     int labelEnd = gen_label();
 
-    gen_code(&($$->iloc_code_list), OP_CMP_EQ, t1, t2, t3, -1);
-    gen_code(&($$->iloc_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
-    gen_label_code(&($$->iloc_code_list), labelTrue);
-    gen_code(&($$->iloc_code_list), OP_LOADI, 1, -1, t4, -1);
+    gen_code(&($$->asm_code_list), OP_CMP_EQ, t1, t2, t3, -1);
+    gen_code(&($$->asm_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
+    gen_label_code(&($$->asm_code_list), labelTrue);
+    gen_code(&($$->asm_code_list), OP_LOADI, 1, -1, t4, -1);
 
-    gen_code(&($$->iloc_code_list), OP_JUMPI, labelEnd, -1, -1, -1);
-    gen_label_code(&($$->iloc_code_list), labelFalse);
-    gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t4, -1);
+    gen_code(&($$->asm_code_list), OP_JUMPI, labelEnd, -1, -1, -1);
+    gen_label_code(&($$->asm_code_list), labelFalse);
+    gen_code(&($$->asm_code_list), OP_LOADI, 0, -1, t4, -1);
     
     
-    gen_label_code(&($$->iloc_code_list), labelEnd);
-    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+    gen_label_code(&($$->asm_code_list), labelEnd);
+    gen_code(&($$->asm_code_list), OP_NOP, -1, -1, -1, -1);
 
     $$->out_r = t4;
 }
@@ -514,7 +519,7 @@ expression5: expression5 TK_OC_EQ expression4
     add_child($$, $1);
     add_child($$, $3);
 
-    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    $$->asm_code_list = concatenate_code($1->asm_code_list, $3->asm_code_list);
     int t1 = $1->out_r;
     int t2 = $3->out_r;
     int t3 = gen_temp();
@@ -523,18 +528,18 @@ expression5: expression5 TK_OC_EQ expression4
     int labelFalse = gen_label();
     int labelEnd = gen_label();
 
-    gen_code(&($$->iloc_code_list), OP_CMP_NE, t1, t2, t3, -1);
-    gen_code(&($$->iloc_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
-    gen_label_code(&($$->iloc_code_list), labelTrue);
-    gen_code(&($$->iloc_code_list), OP_LOADI, 1, -1, t4, -1);
+    gen_code(&($$->asm_code_list), OP_CMP_NE, t1, t2, t3, -1);
+    gen_code(&($$->asm_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
+    gen_label_code(&($$->asm_code_list), labelTrue);
+    gen_code(&($$->asm_code_list), OP_LOADI, 1, -1, t4, -1);
 
-    gen_code(&($$->iloc_code_list), OP_JUMPI, labelEnd, -1, -1, -1);
-    gen_label_code(&($$->iloc_code_list), labelFalse);
-    gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t4, -1);
+    gen_code(&($$->asm_code_list), OP_JUMPI, labelEnd, -1, -1, -1);
+    gen_label_code(&($$->asm_code_list), labelFalse);
+    gen_code(&($$->asm_code_list), OP_LOADI, 0, -1, t4, -1);
     
     
-    gen_label_code(&($$->iloc_code_list), labelEnd);
-    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+    gen_label_code(&($$->asm_code_list), labelEnd);
+    gen_code(&($$->asm_code_list), OP_NOP, -1, -1, -1, -1);
 
     $$->out_r = t4;
 }
@@ -549,7 +554,7 @@ expression4: expression4 TK_OC_LE expression3
     add_child($$, $1);
     add_child($$, $3);
 
-    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    $$->asm_code_list = concatenate_code($1->asm_code_list, $3->asm_code_list);
     int t1 = $1->out_r;
     int t2 = $3->out_r;
     int t3 = gen_temp();
@@ -558,18 +563,18 @@ expression4: expression4 TK_OC_LE expression3
     int labelFalse = gen_label();
     int labelEnd = gen_label();
 
-    gen_code(&($$->iloc_code_list), OP_CMP_LE, t1, t2, t3, -1);
-    gen_code(&($$->iloc_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
-    gen_label_code(&($$->iloc_code_list), labelTrue);
-    gen_code(&($$->iloc_code_list), OP_LOADI, 1, -1, t4, -1);
+    gen_code(&($$->asm_code_list), OP_CMP_LE, t1, t2, t3, -1);
+    gen_code(&($$->asm_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
+    gen_label_code(&($$->asm_code_list), labelTrue);
+    gen_code(&($$->asm_code_list), OP_LOADI, 1, -1, t4, -1);
 
-    gen_code(&($$->iloc_code_list), OP_JUMPI, labelEnd, -1, -1, -1);
-    gen_label_code(&($$->iloc_code_list), labelFalse);
-    gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t4, -1);
+    gen_code(&($$->asm_code_list), OP_JUMPI, labelEnd, -1, -1, -1);
+    gen_label_code(&($$->asm_code_list), labelFalse);
+    gen_code(&($$->asm_code_list), OP_LOADI, 0, -1, t4, -1);
     
     
-    gen_label_code(&($$->iloc_code_list), labelEnd);
-    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+    gen_label_code(&($$->asm_code_list), labelEnd);
+    gen_code(&($$->asm_code_list), OP_NOP, -1, -1, -1, -1);
 
     $$->out_r = t4;
 }
@@ -579,7 +584,7 @@ expression4: expression4 TK_OC_LE expression3
     add_child($$, $1);
     add_child($$, $3);
 
-    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    $$->asm_code_list = concatenate_code($1->asm_code_list, $3->asm_code_list);
     int t1 = $1->out_r;
     int t2 = $3->out_r;
     int t3 = gen_temp();
@@ -588,18 +593,18 @@ expression4: expression4 TK_OC_LE expression3
     int labelFalse = gen_label();
     int labelEnd = gen_label();
 
-    gen_code(&($$->iloc_code_list), OP_CMP_GE, t1, t2, t3, -1);
-    gen_code(&($$->iloc_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
-    gen_label_code(&($$->iloc_code_list), labelTrue);
-    gen_code(&($$->iloc_code_list), OP_LOADI, 1, -1, t4, -1);
+    gen_code(&($$->asm_code_list), OP_CMP_GE, t1, t2, t3, -1);
+    gen_code(&($$->asm_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
+    gen_label_code(&($$->asm_code_list), labelTrue);
+    gen_code(&($$->asm_code_list), OP_LOADI, 1, -1, t4, -1);
 
-    gen_code(&($$->iloc_code_list), OP_JUMPI, labelEnd, -1, -1, -1);
-    gen_label_code(&($$->iloc_code_list), labelFalse);
-    gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t4, -1);
+    gen_code(&($$->asm_code_list), OP_JUMPI, labelEnd, -1, -1, -1);
+    gen_label_code(&($$->asm_code_list), labelFalse);
+    gen_code(&($$->asm_code_list), OP_LOADI, 0, -1, t4, -1);
     
     
-    gen_label_code(&($$->iloc_code_list), labelEnd);
-    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+    gen_label_code(&($$->asm_code_list), labelEnd);
+    gen_code(&($$->asm_code_list), OP_NOP, -1, -1, -1, -1);
 
     $$->out_r = t4;
 }
@@ -609,7 +614,7 @@ expression4: expression4 TK_OC_LE expression3
     add_child($$, $1);
     add_child($$, $3);
 
-    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    $$->asm_code_list = concatenate_code($1->asm_code_list, $3->asm_code_list);
     int t1 = $1->out_r;
     int t2 = $3->out_r;
     int t3 = gen_temp();
@@ -618,18 +623,18 @@ expression4: expression4 TK_OC_LE expression3
     int labelFalse = gen_label();
     int labelEnd = gen_label();
 
-    gen_code(&($$->iloc_code_list), OP_CMP_LT, t1, t2, t3, -1);
-    gen_code(&($$->iloc_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
-    gen_label_code(&($$->iloc_code_list), labelTrue);
-    gen_code(&($$->iloc_code_list), OP_LOADI, 1, -1, t4, -1);
+    gen_code(&($$->asm_code_list), OP_CMP_LT, t1, t2, t3, -1);
+    gen_code(&($$->asm_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
+    gen_label_code(&($$->asm_code_list), labelTrue);
+    gen_code(&($$->asm_code_list), OP_LOADI, 1, -1, t4, -1);
 
-    gen_code(&($$->iloc_code_list), OP_JUMPI, labelEnd, -1, -1, -1);
-    gen_label_code(&($$->iloc_code_list), labelFalse);
-    gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t4, -1);
+    gen_code(&($$->asm_code_list), OP_JUMPI, labelEnd, -1, -1, -1);
+    gen_label_code(&($$->asm_code_list), labelFalse);
+    gen_code(&($$->asm_code_list), OP_LOADI, 0, -1, t4, -1);
     
     
-    gen_label_code(&($$->iloc_code_list), labelEnd);
-    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+    gen_label_code(&($$->asm_code_list), labelEnd);
+    gen_code(&($$->asm_code_list), OP_NOP, -1, -1, -1, -1);
 
     $$->out_r = t4;
 }
@@ -639,7 +644,7 @@ expression4: expression4 TK_OC_LE expression3
     add_child($$, $1);
     add_child($$, $3);
 
-    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    $$->asm_code_list = concatenate_code($1->asm_code_list, $3->asm_code_list);
     int t1 = $1->out_r;
     int t2 = $3->out_r;
     int t3 = gen_temp();
@@ -648,18 +653,18 @@ expression4: expression4 TK_OC_LE expression3
     int labelFalse = gen_label();
     int labelEnd = gen_label();
 
-    gen_code(&($$->iloc_code_list), OP_CMP_GT, t1, t2, t3, -1);
-    gen_code(&($$->iloc_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
-    gen_label_code(&($$->iloc_code_list), labelTrue);
-    gen_code(&($$->iloc_code_list), OP_LOADI, 1, -1, t4, -1);
+    gen_code(&($$->asm_code_list), OP_CMP_GT, t1, t2, t3, -1);
+    gen_code(&($$->asm_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
+    gen_label_code(&($$->asm_code_list), labelTrue);
+    gen_code(&($$->asm_code_list), OP_LOADI, 1, -1, t4, -1);
 
-    gen_code(&($$->iloc_code_list), OP_JUMPI, labelEnd, -1, -1, -1);
-    gen_label_code(&($$->iloc_code_list), labelFalse);
-    gen_code(&($$->iloc_code_list), OP_LOADI, 0, -1, t4, -1);
+    gen_code(&($$->asm_code_list), OP_JUMPI, labelEnd, -1, -1, -1);
+    gen_label_code(&($$->asm_code_list), labelFalse);
+    gen_code(&($$->asm_code_list), OP_LOADI, 0, -1, t4, -1);
     
     
-    gen_label_code(&($$->iloc_code_list), labelEnd);
-    gen_code(&($$->iloc_code_list), OP_NOP, -1, -1, -1, -1);
+    gen_label_code(&($$->asm_code_list), labelEnd);
+    gen_code(&($$->asm_code_list), OP_NOP, -1, -1, -1, -1);
 
     $$->out_r = t4;
 }
@@ -674,13 +679,13 @@ expression3: expression3 '+' expression2
     add_child($$, $1);
     add_child($$, $3);
 
-    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    $$->asm_code_list = concatenate_code($1->asm_code_list, $3->asm_code_list);
 
     int t1 = $1->out_r;
     int t2 = $3->out_r;
     int t3 = gen_temp();
 
-    gen_code(&($$->iloc_code_list), OP_ADD, t1, t2, t3, -1);
+    gen_code(&($$->asm_code_list), OP_ADD, t1, t2, t3, -1);
     
     $$->out_r = t3;
 }
@@ -690,12 +695,12 @@ expression3: expression3 '+' expression2
     add_child($$, $1);
     add_child($$, $3);
 
-    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    $$->asm_code_list = concatenate_code($1->asm_code_list, $3->asm_code_list);
     int t1 = $1->out_r;
     int t2 = $3->out_r;
     int t3 = gen_temp();
 
-    gen_code(&($$->iloc_code_list), OP_SUB, t1, t2, t3, -1);
+    gen_code(&($$->asm_code_list), OP_SUB, t1, t2, t3, -1);
     $$->out_r = t3;
 }
 | expression2
@@ -709,12 +714,12 @@ expression2: expression2 '*' expression1
     add_child($$, $1);
     add_child($$, $3);
 
-    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    $$->asm_code_list = concatenate_code($1->asm_code_list, $3->asm_code_list);
     int t1 = $1->out_r;
     int t2 = $3->out_r;
     int t3 = gen_temp();
 
-    gen_code(&($$->iloc_code_list), OP_MULT, t1, t2, t3, -1);
+    gen_code(&($$->asm_code_list), OP_MULT, t1, t2, t3, -1);
     $$->out_r = t3;
 }
 | expression2 '/' expression1 
@@ -723,12 +728,12 @@ expression2: expression2 '*' expression1
     add_child($$, $1);
     add_child($$, $3);
 
-    $$->iloc_code_list = concatenate_code($1->iloc_code_list, $3->iloc_code_list);
+    $$->asm_code_list = concatenate_code($1->asm_code_list, $3->asm_code_list);
     int t1 = $1->out_r;
     int t2 = $3->out_r;
     int t3 = gen_temp();
 
-    gen_code(&($$->iloc_code_list), OP_DIV, t1, t2, t3, -1);
+    gen_code(&($$->asm_code_list), OP_DIV, t1, t2, t3, -1);
     $$->out_r = t3;
 }
 | expression2 '%' expression1 
@@ -747,10 +752,10 @@ expression1: negation_expression expression0
     $$ = $1;
     add_child($$, $2);
 
-    $$->iloc_code_list = concatenate_code($$->iloc_code_list, $2->iloc_code_list);
+    $$->asm_code_list = concatenate_code($$->asm_code_list, $2->asm_code_list);
     int t1 = $2->out_r;
     int t2 = gen_temp();
-    gen_code(&($$->iloc_code_list), OP_NEG_LOG, t1, -1, t2, -1);
+    gen_code(&($$->asm_code_list), OP_NEG_LOG, t1, -1, t2, -1);
 
     $$->out_r = t2;
 }
@@ -759,10 +764,10 @@ expression1: negation_expression expression0
     $$ = $1;
     add_child($$, $2);
 
-    $$->iloc_code_list = concatenate_code($$->iloc_code_list, $2->iloc_code_list);
+    $$->asm_code_list = concatenate_code($$->asm_code_list, $2->asm_code_list);
     int t1 = $2->out_r;
     int t2 = gen_temp();
-    gen_code(&($$->iloc_code_list), OP_NEG, t1, -1, t2, -1);
+    gen_code(&($$->asm_code_list), OP_NEG, t1, -1, t2, -1);
 
     $$->out_r = t2;
 }
@@ -812,9 +817,9 @@ operands: TK_IDENTIFICADOR
     int t = gen_temp();
 
     if(symbol.isGlobal){
-        gen_code(&($$->iloc_code_list), OP_LOADAI_GLOBAL, address, -1, t, -1);
+        gen_code(&($$->asm_code_list), OP_LOADAI_GLOBAL, address, -1, t, -1);
     } else{
-        gen_code(&($$->iloc_code_list), OP_LOADAI_LOCAL, address, -1, t, -1);
+        gen_code(&($$->asm_code_list), OP_LOADAI_LOCAL, address, -1, t, -1);
     }
 
     $$->out_r = t;
@@ -853,7 +858,7 @@ literal: TK_LIT_INT
     int value = atoi($1.token_val);
     int t = gen_temp();
 
-    gen_code(&($$->iloc_code_list), OP_LOADI, value, -1, t, -1);
+    gen_code(&($$->asm_code_list), OP_LOADI, value, -1, t, -1);
 
     $$->out_r = t;
 } 
