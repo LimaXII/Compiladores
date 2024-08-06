@@ -414,7 +414,7 @@ control_command: TK_PR_IF '(' expression ')' command_block
 
     $$->asm_code_list = concatenate_code($$->asm_code_list, $3->asm_code_list);
 
-    gen_code(&($$->asm_code_list), OP_CMP_EQ, t1, t2, t3, -1);
+    gen_code(&($$->asm_code_list), OP_CMP_NE, t1, t2, t3, -1);
     gen_code(&($$->asm_code_list), OP_CBR, t3, -1, labelTrue, labelFalse);
 
     gen_label_code(&($$->asm_code_list), labelTrue);

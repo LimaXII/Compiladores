@@ -133,7 +133,7 @@ void print_asm_code_list(AsmCodeList* head) {
             case OP_CMP_EQ:
                 printf("    movl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
                 printf("    movl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
-                printf("    cmp      %s, %s\n", "%edx", "%eax");
+                printf("    cmp     %s, %s\n", "%edx", "%eax");
                 printf("    movl    $0, %s\n", "%eax");
                 printf("    sete    %s\n", "%al");
                 printf("    movl    %s, _temp_r_%d(%s)\n", "%eax", current->asm_code.t3, "%rip");
@@ -141,9 +141,9 @@ void print_asm_code_list(AsmCodeList* head) {
             case OP_CMP_NE:
                 printf("    movl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
                 printf("    movl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
-                printf("    cmp      %s, %s\n", "%edx", "%eax");
+                printf("    cmp     %s, %s\n", "%edx", "%eax");
                 printf("    movl    $0, %s\n", "%eax");
-                printf("    setne    %s\n", "%al");
+                printf("    setne   %s\n", "%al");
                 printf("    movl    %s, _temp_r_%d(%s)\n", "%eax", current->asm_code.t3, "%rip");
                 break;
             case OP_CMP_GT:
@@ -207,7 +207,7 @@ void print_asm_code_list(AsmCodeList* head) {
                 printf("\tmovl %s, -%d(%s)\n"            , "%edx"            , current->asm_code.t3   , "%rbp");
                 break;
             case OP_LABEL:
-                printf("L%d: ", current->asm_code.t1);
+                printf("l%d: \n", current->asm_code.t1);
                 break;
             case OP_RETURN:
                 printf("\tmovl _temp_r_%d(%s), %s\n", current->asm_code.t1, "%rip", "%eax");
