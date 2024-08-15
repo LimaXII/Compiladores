@@ -20,7 +20,7 @@ Node* create_node_valor_lexico(Valor_lexico valor_lexico, DataType data_type) {
     new_node->daddy = NULL;
     new_node->data_type = data_type;
     new_node->child_count = 0;
-    new_node->iloc_code_list = NULL;
+    new_node->asm_code_list = NULL;
     new_node->out_r = -1;
 
     return new_node;
@@ -57,7 +57,7 @@ Node* create_node_token(char* token, DataType data_type){
     new_node->daddy = NULL;
     new_node->data_type = data_type;
     new_node->child_count = 0;
-    new_node->iloc_code_list = NULL;
+    new_node->asm_code_list = NULL;
     new_node->out_r = -1;
     return new_node;
 }
