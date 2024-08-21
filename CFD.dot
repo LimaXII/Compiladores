@@ -1,19 +1,20 @@
 digraph CFG {
 	subgraph cluster_0 {
 		label="Block 0";
-		"0x56473b2d1910" [label="0: movl $4, _temp_r_0(%rip)"];
-		"0x56473b2d1940" [label="0: movl _temp_r_0(%rip), %edxmovl %edx, global1(%rip)"];
-		"0x56473b2d1970" [label="0: movl $9, _temp_r_1(%rip)"];
-		"0x56473b2d19a0" [label="0: movl _temp_r_1(%rip), %edxmovl %edx, global2(%rip)"];
-		"0x56473b2d19d0" [label="0: movl global2(%rip), %edxmovl %edx, _temp_r_2(%rip)"];
-		"0x56473b2d1a00" [label="0: movl global1(%rip), %edxmovl %edx, _temp_r_3(%rip)"];
-		"0x56473b2d1a30" [label="0: movl    _temp_r_2(%rip), %eax movl    _temp_r_3(%rip), %edx addl    %edx, %eax movl    %eax, _temp_r_4(%rip) "];
-		"0x56473b2d1a60" [label="0: movl _temp_r_4(%rip), %edxmovl %edx, global0(%rip)"];
-		"0x56473b2d1a90" [label="0: movl global0(%rip), %edxmovl %edx, _temp_r_5(%rip)"];
+		"init_block" [label="1: pushq   %rbp\n2: movq    %rsp, %rbp\n"];
+		"0x561309242910" [label="movl $4, _temp_r_0(%rip)\n"];
+		"0x561309242940" [label="movl _temp_r_0(%rip), %edx\nmovl %edx, global1(%rip)\n"];
+		"0x561309242970" [label="movl $9, _temp_r_1(%rip)\n"];
+		"0x5613092429a0" [label="movl _temp_r_1(%rip), %edx\nmovl %edx, global2(%rip)\n"];
+		"0x5613092429d0" [label="movl global2(%rip), %edx\nmovl %edx, _temp_r_2(%rip)\n"];
+		"0x561309242a00" [label="movl global1(%rip), %edx\nmovl %edx, _temp_r_3(%rip)\n"];
+		"0x561309242a30" [label="movl    _temp_r_2(%rip), %eax\nmovl    _temp_r_3(%rip), %edx\naddl    %edx, %eax\nmovl    %eax, _temp_r_4(%rip)\n"];
+		"0x561309242a60" [label="movl _temp_r_4(%rip), %edx\nmovl %edx, global0(%rip)\n"];
+		"0x561309242a90" [label="movl global0(%rip), %edx\nmovl %edx, _temp_r_5(%rip)\n"];
 		"Block0" -> "Block1";
 	}
 	subgraph cluster_1 {
 		label="Block 1";
-		"0x56473b2d1ac0" [label="1: movl _temp_r_5(%rip), %eaxpopq %rbpret"];
+		"0x561309242ac0" [label="movl _temp_r_5(%rip), %eax\npopq %rbp\nret\n"];
 	}
 }
