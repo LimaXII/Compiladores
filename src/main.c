@@ -25,9 +25,9 @@ int main (int argc, char **argv)
     //print_iloc_code_list(mainFunctionNode->iloc_code_list);
   //}
 
-  generateAsm(mainFunctionNode->asm_code_list);
+  //generateAsm(mainFunctionNode->asm_code_list);
 
-  //generate_cfg_dot(mainFunctionNode->asm_code_list);
+  generate_cfg_dot(mainFunctionNode->asm_code_list);
   
   //exporta (arvore);
   yylex_destroy();
