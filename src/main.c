@@ -6,6 +6,7 @@
 #include "table.h"
 #include "asm.h"
 #include "ast_tree.h"
+#include "generate_cfg.h"
 
 extern int yyparse(void);
 extern int yylex_destroy(void);
@@ -25,6 +26,8 @@ int main (int argc, char **argv)
   //}
 
   generateAsm(mainFunctionNode->asm_code_list);
+
+  //generate_cfg_dot(mainFunctionNode->asm_code_list);
   
   //exporta (arvore);
   yylex_destroy();

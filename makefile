@@ -7,10 +7,10 @@ HDIR = ./include
 LDIR = ./
 TESTDIR = ./test
 
-_OBJ = main.o lex.yy.o parser.tab.o valor_lexico.o ast_tree.o table.o asm.o
+_OBJ = main.o lex.yy.o parser.tab.o valor_lexico.o ast_tree.o table.o asm.o generate_cfg.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
-all: etapa6
+all: etapa7
 
 # Comando do bison para gerar o parser.tab.c
 $(ODIR)/parser.tab.c $(HDIR)/parser.tab.h: $(ODIR)/parser.y
@@ -42,11 +42,15 @@ $(ODIR)/table.o: $(ODIR)/table.c $(HDIR)/table.h
 $(ODIR)/asm.o: $(ODIR)/asm.c $(HDIR)/asm.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-etapa6: $(OBJ)
+# Regra para compilar generate_cfg.o
+$(ODIR)/generate_cfg.o: $(ODIR)/generate_cfg.c $(HDIR)/generate_cfg.h
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+etapa7: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 .PHONY: clean
 
 # Remove todos os arquivos necessários.
 clean:
-	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ etapa6 $(ODIR)/lex.yy.c $(ODIR)/parser.tab.c $(ODIR)/parser.tab.h
+	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ etapa7 $(ODIR)/lex.yy.c $(ODIR)/parser.tab.c $(ODIR)/parser.tab.h
