@@ -1,20 +1,65 @@
+## --------------------
+## SEGMENTO DE DADOS
+## --------------------
+#.data
+## ->Variáveis globais
+#global0:	.long	0
+#global1:	.long	0
+#global2:	.long	0
+## ->Registradores ASM
+#_temp_r_0:	.long	0
+#_temp_r_1:	.long	0
+#_temp_r_2:	.long	0
+#_temp_r_3:	.long	0
+#_temp_r_4:	.long	0
+#_temp_r_5:	.long	0
+## --------------------
+## SEGMENTO DE CÓDIGO
+## --------------------
+#	.text
+#	.globl	main
+#	.type	main, @function
+#main:
+#	pushq	%rbp
+#	movq %rsp, %rbp
+#	movl $4, _temp_r_0(%rip)
+#	movl _temp_r_0(%rip), %edx
+#	movl %edx, global1(%rip)
+#	movl $9, _temp_r_1(%rip)
+#	movl _temp_r_1(%rip), %edx
+#	movl %edx, global2(%rip)
+#	movl global2(%rip), %edx
+#	movl %edx, _temp_r_2(%rip)
+#	movl global1(%rip), %edx
+#	movl %edx, _temp_r_3(%rip)
+#	movl    _temp_r_2(%rip), %eax 
+#	movl    _temp_r_3(%rip), %edx 
+#	addl    %edx, %eax 
+#	movl    %eax, _temp_r_4(%rip) 
+#	movl _temp_r_4(%rip), %edx
+#	movl %edx, global0(%rip)
+#	movl global0(%rip), %edx
+#	movl %edx, _temp_r_5(%rip)
+#	movl _temp_r_5(%rip), %eax
+#	popq %rbp
+#	ret
 digraph CFG {
 	subgraph cluster_0 {
 		label="Block 0";
 		"init_block" [label="1: pushq   %rbp\n2: movq    %rsp, %rbp\n"];
-		"0x561309242910" [label="movl $4, _temp_r_0(%rip)\n"];
-		"0x561309242940" [label="movl _temp_r_0(%rip), %edx\nmovl %edx, global1(%rip)\n"];
-		"0x561309242970" [label="movl $9, _temp_r_1(%rip)\n"];
-		"0x5613092429a0" [label="movl _temp_r_1(%rip), %edx\nmovl %edx, global2(%rip)\n"];
-		"0x5613092429d0" [label="movl global2(%rip), %edx\nmovl %edx, _temp_r_2(%rip)\n"];
-		"0x561309242a00" [label="movl global1(%rip), %edx\nmovl %edx, _temp_r_3(%rip)\n"];
-		"0x561309242a30" [label="movl    _temp_r_2(%rip), %eax\nmovl    _temp_r_3(%rip), %edx\naddl    %edx, %eax\nmovl    %eax, _temp_r_4(%rip)\n"];
-		"0x561309242a60" [label="movl _temp_r_4(%rip), %edx\nmovl %edx, global0(%rip)\n"];
-		"0x561309242a90" [label="movl global0(%rip), %edx\nmovl %edx, _temp_r_5(%rip)\n"];
+		"0x56425c51e910" [label="3: movl $4, _temp_r_0(%rip)\n"];
+		"0x56425c51e940" [label="3: movl _temp_r_0(%rip), %edx\n4: movl %edx, global1(%rip)\n"];
+		"0x56425c51e970" [label="5: movl $9, _temp_r_1(%rip)\n"];
+		"0x56425c51e9a0" [label="5: movl _temp_r_1(%rip), %edx\n6: movl %edx, global2(%rip)\n"];
+		"0x56425c51e9d0" [label="7: movl global2(%rip), %edx\n8: movl %edx, _temp_r_2(%rip)\n"];
+		"0x56425c51ea00" [label="9: movl global1(%rip), %edx\n10: movl %edx, _temp_r_3(%rip)\n"];
+		"0x56425c51ea30" [label="11: movl    _temp_r_2(%rip), %eax\n12: movl    _temp_r_3(%rip), %edx\n13: addl    %edx, %eax\n14: movl    %eax, _temp_r_4(%rip)\n"];
+		"0x56425c51ea60" [label="14: movl _temp_r_4(%rip), %edx\n15: movl %edx, global0(%rip)\n"];
+		"0x56425c51ea90" [label="16: movl global0(%rip), %edx\n17: movl %edx, _temp_r_5(%rip)\n"];
 		"Block0" -> "Block1";
 	}
 	subgraph cluster_1 {
 		label="Block 1";
-		"0x561309242ac0" [label="movl _temp_r_5(%rip), %eax\npopq %rbp\nret\n"];
+		"0x56425c51eac0" [label="18: movl _temp_r_5(%rip), %eax\n19: popq %rbp\n20: ret\n"];
 	}
 }

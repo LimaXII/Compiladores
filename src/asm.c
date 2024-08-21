@@ -77,142 +77,142 @@ void print_asm_code_list(AsmCodeList* head) {
     while (current) {
         switch (current->asm_code.opcode) {
             case OP_NOP:
-                printf("\tnop\n");
+                printf("#\tnop\n");
                 break;
             case OP_ADD:
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
-                printf("\taddl    %s, %s \n", "%edx", "%eax");
-                printf("\tmovl    %s, _temp_r_%d(%s) \n", "%eax", current->asm_code.t3, "%rip");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
+                printf("#\taddl    %s, %s \n", "%edx", "%eax");
+                printf("#\tmovl    %s, _temp_r_%d(%s) \n", "%eax", current->asm_code.t3, "%rip");
                 break;
             case OP_SUB:
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
-                printf("\tsubl    %s, %s \n", "%edx", "%eax");
-                printf("\tmovl    %s, _temp_r_%d(%s) \n", "%eax", current->asm_code.t3, "%rip");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
+                printf("#\tsubl    %s, %s \n", "%edx", "%eax");
+                printf("#\tmovl    %s, _temp_r_%d(%s) \n", "%eax", current->asm_code.t3, "%rip");
                 break;
             case OP_MULT:
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
-                printf("\timull   _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%eax");
-                printf("\tmovl    %s, _temp_r_%d(%s) \n", "%eax", current->asm_code.t3, "%rip");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
+                printf("#\timull   _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%eax");
+                printf("#\tmovl    %s, _temp_r_%d(%s) \n", "%eax", current->asm_code.t3, "%rip");
                 break;
             case OP_DIV:
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
-                printf("\tcdq \n");
-                printf("\tidivl   _temp_r_%d(%s)\n", current->asm_code.t2, "%rip");
-                printf("\tmovl    %s, _temp_r_%d(%s) \n", "%eax", current->asm_code.t3, "%rip");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
+                printf("#\tcdq \n");
+                printf("#\tidivl   _temp_r_%d(%s)\n", current->asm_code.t2, "%rip");
+                printf("#\tmovl    %s, _temp_r_%d(%s) \n", "%eax", current->asm_code.t3, "%rip");
                 break;
             case OP_NEG:
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
-                printf("\tnegl    %s \n", "%eax");
-                printf("\tmovl    %s, _temp_r_%d(%s) \n", "%eax", current->asm_code.t3, "%rip");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
+                printf("#\tnegl    %s \n", "%eax");
+                printf("#\tmovl    %s, _temp_r_%d(%s) \n", "%eax", current->asm_code.t3, "%rip");
                 break;
             case OP_NEG_LOG:
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
-                printf("\ttest    %s, %s\n", "%eax", "%eax");
-                printf("\tmovl    $0, %s\n", "%eax");
-                printf("\tsete    %s\n", "%al");
-                printf("\tmovl    %s, _temp_r_%d(%s)\n", "%eax", current->asm_code.t3, "%rip");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
+                printf("#\ttest    %s, %s\n", "%eax", "%eax");
+                printf("#\tmovl    $0, %s\n", "%eax");
+                printf("#\tsete    %s\n", "%al");
+                printf("#\tmovl    %s, _temp_r_%d(%s)\n", "%eax", current->asm_code.t3, "%rip");
                 break;
             case OP_AND:
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
-                printf("\ttest    %s, %s\n", "%eax", "%edx");
-                printf("\tmovl    $0, %s\n", "%eax");
-                printf("\tsetne    %s\n", "%al");
-                printf("\tmovl    %s, _temp_r_%d(%s)\n", "%eax", current->asm_code.t3, "%rip");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
+                printf("#\ttest    %s, %s\n", "%eax", "%edx");
+                printf("#\tmovl    $0, %s\n", "%eax");
+                printf("#\tsetne    %s\n", "%al");
+                printf("#\tmovl    %s, _temp_r_%d(%s)\n", "%eax", current->asm_code.t3, "%rip");
                 break;
             case OP_OR:
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
-                printf("\tor      %s, %s\n", "%eax", "%edx");
-                printf("\tmovl    $0, %s\n", "%eax");
-                printf("\tsetne    %s\n", "%al");
-                printf("\tmovl    %s, _temp_r_%d(%s)\n", "%eax", current->asm_code.t3, "%rip");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
+                printf("#\tor      %s, %s\n", "%eax", "%edx");
+                printf("#\tmovl    $0, %s\n", "%eax");
+                printf("#\tsetne    %s\n", "%al");
+                printf("#\tmovl    %s, _temp_r_%d(%s)\n", "%eax", current->asm_code.t3, "%rip");
                 break;
             case OP_CMP_EQ:
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
-                printf("\tcmp     %s, %s\n", "%edx", "%eax");
-                printf("\tmovl    $0, %s\n", "%eax");
-                printf("\tsete    %s\n", "%al");
-                printf("\tmovl    %s, _temp_r_%d(%s)\n", "%eax", current->asm_code.t3, "%rip");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
+                printf("#\tcmp     %s, %s\n", "%edx", "%eax");
+                printf("#\tmovl    $0, %s\n", "%eax");
+                printf("#\tsete    %s\n", "%al");
+                printf("#\tmovl    %s, _temp_r_%d(%s)\n", "%eax", current->asm_code.t3, "%rip");
                 break;
             case OP_CMP_NE:
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
-                printf("\tcmp     %s, %s\n", "%edx", "%eax");
-                printf("\tmovl    $0, %s\n", "%eax");
-                printf("\tsetne   %s\n", "%al");
-                printf("\tmovl    %s, _temp_r_%d(%s)\n", "%eax", current->asm_code.t3, "%rip");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
+                printf("#\tcmp     %s, %s\n", "%edx", "%eax");
+                printf("#\tmovl    $0, %s\n", "%eax");
+                printf("#\tsetne   %s\n", "%al");
+                printf("#\tmovl    %s, _temp_r_%d(%s)\n", "%eax", current->asm_code.t3, "%rip");
                 break;
             case OP_CMP_GT:
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
-                printf("\tcmp      %s, %s\n", "%edx", "%eax");
-                printf("\tmovl    $0, %s\n", "%eax");
-                printf("\tsetg    %s\n", "%al");
-                printf("\tmovl    %s, _temp_r_%d(%s)\n", "%eax", current->asm_code.t3, "%rip");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
+                printf("#\tcmp      %s, %s\n", "%edx", "%eax");
+                printf("#\tmovl    $0, %s\n", "%eax");
+                printf("#\tsetg    %s\n", "%al");
+                printf("#\tmovl    %s, _temp_r_%d(%s)\n", "%eax", current->asm_code.t3, "%rip");
                 break;
             case OP_CMP_LT:
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
-                printf("\tcmp      %s, %s\n", "%edx", "%eax");
-                printf("\tmovl    $0, %s\n", "%eax");
-                printf("\tsetl    %s\n", "%al");
-                printf("\tmovl    %s, _temp_r_%d(%s)\n", "%eax", current->asm_code.t3, "%rip");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
+                printf("#\tcmp      %s, %s\n", "%edx", "%eax");
+                printf("#\tmovl    $0, %s\n", "%eax");
+                printf("#\tsetl    %s\n", "%al");
+                printf("#\tmovl    %s, _temp_r_%d(%s)\n", "%eax", current->asm_code.t3, "%rip");
                 break;
             case OP_CMP_GE:
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
-                printf("\tcmp      %s, %s\n", "%edx", "%eax");
-                printf("\tmovl    $0, %s\n", "%eax");
-                printf("\tsetge    %s\n", "%al");
-                printf("\tmovl    %s, _temp_r_%d(%s)\n", "%eax", current->asm_code.t3, "%rip");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
+                printf("#\tcmp      %s, %s\n", "%edx", "%eax");
+                printf("#\tmovl    $0, %s\n", "%eax");
+                printf("#\tsetge    %s\n", "%al");
+                printf("#\tmovl    %s, _temp_r_%d(%s)\n", "%eax", current->asm_code.t3, "%rip");
                 break;
             case OP_CMP_LE:
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
-                printf("\tcmp      %s, %s\n", "%edx", "%eax");
-                printf("\tmovl    $0, %s\n", "%eax");
-                printf("\tsetle    %s\n", "%al");
-                printf("\tmovl    %s, _temp_r_%d(%s)\n", "%eax", current->asm_code.t3, "%rip");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t2, "%rip", "%edx");
+                printf("#\tcmp      %s, %s\n", "%edx", "%eax");
+                printf("#\tmovl    $0, %s\n", "%eax");
+                printf("#\tsetle    %s\n", "%al");
+                printf("#\tmovl    %s, _temp_r_%d(%s)\n", "%eax", current->asm_code.t3, "%rip");
                 break;
             case OP_CBR:
-                printf("\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
-                printf("\ttest    %s, %s\n", "%eax", "%eax"); // eax AND eax
-                printf("\tjnz  l%d\n", current->asm_code.t3);
-                printf("\tjz  l%d\n", current->asm_code.t4);
+                printf("#\tmovl    _temp_r_%d(%s), %s \n", current->asm_code.t1, "%rip", "%eax");
+                printf("#\ttest    %s, %s\n", "%eax", "%eax"); // eax AND eax
+                printf("#\tjnz  l%d\n", current->asm_code.t3);
+                printf("#\tjz  l%d\n", current->asm_code.t4);
                 break;
             case OP_JUMPI:
-                printf("\tjmp l%d\n", current->asm_code.t1);
+                printf("#\tjmp l%d\n", current->asm_code.t1);
                 break;
             case OP_LOADI:
-                printf("\tmovl $%d, _temp_r_%d(%s)\n", current->asm_code.t1, current->asm_code.t3, "%rip");
+                printf("#\tmovl $%d, _temp_r_%d(%s)\n", current->asm_code.t1, current->asm_code.t3, "%rip");
                 break;
             case OP_LOADAI_GLOBAL:
-                printf("\tmovl global%d(%s), %s\n"      , current->asm_code.t1/4   , "%rip"            , "%edx");
-                printf("\tmovl %s, _temp_r_%d(%s)\n"    , "%edx"            , current->asm_code.t3    , "%rip");
+                printf("#\tmovl global%d(%s), %s\n"      , current->asm_code.t1/4   , "%rip"            , "%edx");
+                printf("#\tmovl %s, _temp_r_%d(%s)\n"    , "%edx"            , current->asm_code.t3    , "%rip");
                 break;
             case OP_LOADAI_LOCAL:
-                printf("\tmovl -%d(%s), %s\n"           , current->asm_code.t1     , "%rbp"            , "%edx");
-                printf("\tmovl %s, _temp_r_%d(%s)\n"    , "%edx"            , current->asm_code.t3    , "%rip");
+                printf("#\tmovl -%d(%s), %s\n"           , current->asm_code.t1     , "%rbp"            , "%edx");
+                printf("#\tmovl %s, _temp_r_%d(%s)\n"    , "%edx"            , current->asm_code.t3    , "%rip");
                 break;
             case OP_STOREAI_GLOBAL:
-                printf("\tmovl _temp_r_%d(%s), %s\n"    , current->asm_code.t1     , "%rip"            , "%edx");
-                printf("\tmovl %s, global%d(%s)\n"      , "%edx"            , current->asm_code.t3 / 4, "%rip");
+                printf("#\tmovl _temp_r_%d(%s), %s\n"    , current->asm_code.t1     , "%rip"            , "%edx");
+                printf("#\tmovl %s, global%d(%s)\n"      , "%edx"            , current->asm_code.t3 / 4, "%rip");
                 break;
             case OP_STOREAI_LOCAL:
-                printf("\tmovl _temp_r_%d(%s), %s\n"    , current->asm_code.t1     , "%rip"            , "%edx");
-                printf("\tmovl %s, -%d(%s)\n"            , "%edx"            , current->asm_code.t3   , "%rbp");
+                printf("#\tmovl _temp_r_%d(%s), %s\n"    , current->asm_code.t1     , "%rip"            , "%edx");
+                printf("#\tmovl %s, -%d(%s)\n"            , "%edx"            , current->asm_code.t3   , "%rbp");
                 break;
             case OP_LABEL:
                 printf("l%d: \n", current->asm_code.t1);
                 break;
             case OP_RETURN:
-                printf("\tmovl _temp_r_%d(%s), %s\n", current->asm_code.t1, "%rip", "%eax");
-                printf("\tpopq %s\n", "%rbp");
-                printf("\tret\n");
+                printf("#\tmovl _temp_r_%d(%s), %s\n", current->asm_code.t1, "%rip", "%eax");
+                printf("#\tpopq %s\n", "%rbp");
+                printf("#\tret\n");
                 break;
             default:
                 printf("Instrução desconhecida.\n");
@@ -263,31 +263,31 @@ void generateAsm(AsmCodeList *head)
     int bucket_idx;
     TableNode* entry;
     int i = 0;
-    printf("# --------------------\n# SEGMENTO DE DADOS\n# --------------------\n");
-    printf(".data\n");
-    printf("# ->Variáveis globais\n");
+    printf("## --------------------\n## SEGMENTO DE DADOS\n## --------------------\n");
+    printf("#.data\n");
+    printf("## ->Variáveis globais\n");
     for (bucket_idx=0; bucket_idx < globalTable->bucket_count; bucket_idx++)
     {
         entry = globalTable->buckets[bucket_idx].nodes;
         while (entry != NULL){
             if(entry->entry.nature == NATURE_IDENTIFIER){
-                printf("global%d:\t.long\t0\n", i);
+                printf("#global%d:\t.long\t0\n", i);
                 i++;
             }
             entry = entry->next;
         }
     }
-    printf("# ->Registradores ASM\n");
+    printf("## ->Registradores ASM\n");
     for(int i = 0; i < n_registers; i++){
-        printf("_temp_r_%d:\t.long\t0\n", i);
+        printf("#_temp_r_%d:\t.long\t0\n", i);
     }
 
-    printf("# --------------------\n# SEGMENTO DE CÓDIGO\n# --------------------\n");
+    printf("## --------------------\n## SEGMENTO DE CÓDIGO\n## --------------------\n");
 
     // Adiciona info da main
-    printf("\t.text\n\t.globl\tmain\n\t.type\tmain, @function\nmain:\n");
-    printf("\tpushq	%s\n", "%rbp");
-    printf("\tmovq %s, %s\n", "%rsp","%rbp");
+    printf("#\t.text\n#\t.globl\tmain\n#\t.type\tmain, @function\n#main:\n");
+    printf("#\tpushq	%s\n", "%rbp");
+    printf("#\tmovq %s, %s\n", "%rsp","%rbp");
 
     print_asm_code_list(head);
 }

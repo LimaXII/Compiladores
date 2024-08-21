@@ -9,5 +9,6 @@
         "stdio.h": "c",
         "iloc.h": "c",
         "generate_cfg.h": "c"
-    }
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }
