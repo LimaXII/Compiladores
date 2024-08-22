@@ -207,7 +207,7 @@ void print_asm_code_list(AsmCodeList* head) {
                 printf("#\tmovl %s, -%d(%s)\n"            , "%edx"            , current->asm_code.t3   , "%rbp");
                 break;
             case OP_LABEL:
-                printf("l%d: \n", current->asm_code.t1);
+                printf("#l%d: \n", current->asm_code.t1);
                 break;
             case OP_RETURN:
                 printf("#\tmovl _temp_r_%d(%s), %s\n", current->asm_code.t1, "%rip", "%eax");

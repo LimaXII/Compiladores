@@ -13,6 +13,13 @@
 #_temp_r_3:	.long	0
 #_temp_r_4:	.long	0
 #_temp_r_5:	.long	0
+#_temp_r_6:	.long	0
+#_temp_r_7:	.long	0
+#_temp_r_8:	.long	0
+#_temp_r_9:	.long	0
+#_temp_r_10:	.long	0
+#_temp_r_11:	.long	0
+#_temp_r_12:	.long	0
 ## --------------------
 ## SEGMENTO DE CÓDIGO
 ## --------------------
@@ -40,11 +47,73 @@
 #	movl %edx, global0(%rip)
 #	movl global0(%rip), %edx
 #	movl %edx, _temp_r_5(%rip)
-#	movl _temp_r_5(%rip), %eax
+#	movl global1(%rip), %edx
+#	movl %edx, _temp_r_6(%rip)
+#	movl    _temp_r_5(%rip), %eax 
+#	movl    _temp_r_6(%rip), %edx 
+#	cmp      %edx, %eax
+#	movl    $0, %eax
+#	setg    %al
+#	movl    %eax, _temp_r_7(%rip)
+#	movl    _temp_r_7(%rip), %eax 
+#	test    %eax, %eax
+#	jnz  l0
+#	jz  l1
+#l0: 
+#	movl $1, _temp_r_8(%rip)
+#	jmp l2
+#l1: 
+#	movl $0, _temp_r_8(%rip)
+#l2: 
+#	nop
+#	movl $0, _temp_r_11(%rip)
+#	movl    _temp_r_8(%rip), %eax 
+#	movl    _temp_r_11(%rip), %edx 
+#	cmp     %edx, %eax
+#	movl    $0, %eax
+#	setne   %al
+#	movl    %eax, _temp_r_12(%rip)
+#	movl    _temp_r_12(%rip), %eax 
+#	test    %eax, %eax
+#	jnz  l3
+#	jz  l4
+#l3: 
+#	nop
+#	movl global0(%rip), %edx
+#	movl %edx, _temp_r_9(%rip)
+#	movl _temp_r_9(%rip), %eax
 #	popq %rbp
 #	ret
+#	jmp l5
+#l4: 
+#	nop
+#	movl global1(%rip), %edx
+#	movl %edx, _temp_r_10(%rip)
+#	movl _temp_r_10(%rip), %eax
+#	popq %rbp
+#	ret
+#l5: 
+#	nop
 digraph CFG {
-	"Block0" [label="1: pushq   %rbp\n2: movq    %rsp, %rbp\n3: movl $4, _temp_r_0(%rip)\n4: movl _temp_r_0(%rip), %edx\n5: movl %edx, global1(%rip)\n6: movl $9, _temp_r_1(%rip)\n7: movl _temp_r_1(%rip), %edx\n8: movl %edx, global2(%rip)\n9: movl global2(%rip), %edx\n10: movl %edx, _temp_r_2(%rip)\n11: movl global1(%rip), %edx\n12: movl %edx, _temp_r_3(%rip)\n13: movl    _temp_r_2(%rip), %eax\n14: movl    _temp_r_3(%rip), %edx\n15: addl    %edx, %eax\n16: movl    %eax, _temp_r_4(%rip)\n17: movl _temp_r_4(%rip), %edx\n18: movl %edx, global0(%rip)\n19: movl global0(%rip), %edx\n20: movl %edx, _temp_r_5(%rip)\n"];
+	"Block0" [label="1: pushq   %rbp\n2: movq    %rsp, %rbp\n3: movl $4, _temp_r_0(%rip)\n4: movl _temp_r_0(%rip), %edx\n5: movl %edx, global1(%rip)\n6: movl $9, _temp_r_1(%rip)\n7: movl _temp_r_1(%rip), %edx\n8: movl %edx, global2(%rip)\n9: movl global2(%rip), %edx\n10: movl %edx, _temp_r_2(%rip)\n11: movl global1(%rip), %edx\n12: movl %edx, _temp_r_3(%rip)\n13: movl    _temp_r_2(%rip), %eax\n14: movl    _temp_r_3(%rip), %edx\n15: addl    %edx, %eax\n16: movl    %eax, _temp_r_4(%rip)\n17: movl _temp_r_4(%rip), %edx\n18: movl %edx, global0(%rip)\n19: movl global0(%rip), %edx\n20: movl %edx, _temp_r_5(%rip)\n21: movl global1(%rip), %edx\n22: movl %edx, _temp_r_6(%rip)\n23: movl    _temp_r_5(%rip), %eax\n24: movl    _temp_r_6(%rip), %edx\n25: cmp      %edx, %eax\n26: movl    $0, %eax\n27: setg    %al\n28: movl    %eax, _temp_r_7(%rip)\n"];
 	"Block0" -> "Block1";
-	"Block1" [label="21: movl _temp_r_5(%rip), %eax\n22: popq %rbp\n23: ret\n"];
+	"Block1" [label="29: movl    _temp_r_7(%rip), %eax \n30: test    %eax, %eax\n31: jnz  l0\n32: jz  l1\n"];
+	"Block1" -> "Block2";
+	"Block2" [label="33: l0: \n34: movl $1, _temp_r_8(%rip)\n"];
+	"Block2" -> "Block3";
+	"Block3" [label="35: jmp l2\n"];
+	"Block3" -> "Block4";
+	"Block4" [label="36: l1: \n37: movl $0, _temp_r_8(%rip)\n"];
+	"Block4" -> "Block5";
+	"Block5" [label="38: l2: \n39: nop\n40: movl $0, _temp_r_11(%rip)\n41: movl    _temp_r_8(%rip), %eax\n42: movl    _temp_r_11(%rip), %edx\n43: cmp     %edx, %eax\n44: movl    $0, %eax\n45: setne   %al\n46: movl    %eax, _temp_r_12(%rip)\n"];
+	"Block5" -> "Block6";
+	"Block6" [label="47: movl    _temp_r_12(%rip), %eax \n48: test    %eax, %eax\n49: jnz  l3\n50: jz  l4\n"];
+	"Block6" -> "Block7";
+	"Block7" [label="51: l3: \n52: nop\n53: movl global0(%rip), %edx\n54: movl %edx, _temp_r_9(%rip)\n55: movl _temp_r_9(%rip), %eax\n56: popq %rbp\n57: ret\n"];
+	"Block7" -> "Block8";
+	"Block8" [label="58: jmp l5\n"];
+	"Block8" -> "Block9";
+	"Block9" [label="59: l4: \n60: nop\n61: movl global1(%rip), %edx\n62: movl %edx, _temp_r_10(%rip)\n63: movl _temp_r_10(%rip), %eax\n64: popq %rbp\n65: ret\n"];
+	"Block9" -> "Block10";
+	"Block10" [label="66: l5: \n67: nop\n"];
 }
