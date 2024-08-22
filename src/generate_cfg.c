@@ -8,7 +8,6 @@ int is_leader(AsmCodeList* instr) {
         case OP_CBR:
         case OP_JUMPI:
         case OP_LABEL:
-        case OP_RETURN:
             return 1;
         default:
             return 0;
@@ -23,6 +22,7 @@ void generate_cfg_dot(AsmCodeList* asm_code_list) {
     int block_id = 0;
     int prev_block_id = -1;
     int line_number=1;
+    int after_return = 0;
 
     // Criação do primeiro bloco com as instruções padrão
     printf("\t\"Block%d\" [label=\"%d: pushq   %%rbp\\n", block_id, line_number);
@@ -32,13 +32,14 @@ void generate_cfg_dot(AsmCodeList* asm_code_list) {
 
     while (current != NULL) {
         // Verifica se a instrução é líder
-        if (is_leader(current)) {
+        if (is_leader(current) || after_return) {
             printf("\"];\n");
             printf("\t\"Block%d\" -> \"Block%d\";\n", prev_block_id, block_id);
             printf("\t\"Block%d\" [label=\"", block_id);
             prev_block_id = block_id;
             block_id++;
         }
+        after_return = 0;
 
         // Imprimir a instrução com base no opcode
         switch (current->asm_code.opcode) {
@@ -179,6 +180,7 @@ void generate_cfg_dot(AsmCodeList* asm_code_list) {
                 printf("%d: movl _temp_r_%d(%s), %s\\n", ++line_number, current->asm_code.t1, "%rip", "%eax");
                 printf("%d: popq %s\\n", ++line_number, "%rbp");
                 printf("%d: ret\\n", ++line_number);
+                after_return = 1;
                 break;
             default:
                 printf("Instrução desconhecida.");
