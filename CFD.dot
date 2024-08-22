@@ -44,22 +44,7 @@
 #	popq %rbp
 #	ret
 digraph CFG {
-	subgraph cluster_0 {
-		label="Block 0";
-		"init_block" [label="1: pushq   %rbp\n2: movq    %rsp, %rbp\n"];
-		"0x56425c51e910" [label="3: movl $4, _temp_r_0(%rip)\n"];
-		"0x56425c51e940" [label="3: movl _temp_r_0(%rip), %edx\n4: movl %edx, global1(%rip)\n"];
-		"0x56425c51e970" [label="5: movl $9, _temp_r_1(%rip)\n"];
-		"0x56425c51e9a0" [label="5: movl _temp_r_1(%rip), %edx\n6: movl %edx, global2(%rip)\n"];
-		"0x56425c51e9d0" [label="7: movl global2(%rip), %edx\n8: movl %edx, _temp_r_2(%rip)\n"];
-		"0x56425c51ea00" [label="9: movl global1(%rip), %edx\n10: movl %edx, _temp_r_3(%rip)\n"];
-		"0x56425c51ea30" [label="11: movl    _temp_r_2(%rip), %eax\n12: movl    _temp_r_3(%rip), %edx\n13: addl    %edx, %eax\n14: movl    %eax, _temp_r_4(%rip)\n"];
-		"0x56425c51ea60" [label="14: movl _temp_r_4(%rip), %edx\n15: movl %edx, global0(%rip)\n"];
-		"0x56425c51ea90" [label="16: movl global0(%rip), %edx\n17: movl %edx, _temp_r_5(%rip)\n"];
-		"Block0" -> "Block1";
-	}
-	subgraph cluster_1 {
-		label="Block 1";
-		"0x56425c51eac0" [label="18: movl _temp_r_5(%rip), %eax\n19: popq %rbp\n20: ret\n"];
-	}
+	"Block0" [label="1: pushq   %rbp\n2: movq    %rsp, %rbp\n3: movl $4, _temp_r_0(%rip)\n4: movl _temp_r_0(%rip), %edx\n5: movl %edx, global1(%rip)\n6: movl $9, _temp_r_1(%rip)\n7: movl _temp_r_1(%rip), %edx\n8: movl %edx, global2(%rip)\n9: movl global2(%rip), %edx\n10: movl %edx, _temp_r_2(%rip)\n11: movl global1(%rip), %edx\n12: movl %edx, _temp_r_3(%rip)\n13: movl    _temp_r_2(%rip), %eax\n14: movl    _temp_r_3(%rip), %edx\n15: addl    %edx, %eax\n16: movl    %eax, _temp_r_4(%rip)\n17: movl _temp_r_4(%rip), %edx\n18: movl %edx, global0(%rip)\n19: movl global0(%rip), %edx\n20: movl %edx, _temp_r_5(%rip)\n"];
+	"Block0" -> "Block1";
+	"Block1" [label="21: movl _temp_r_5(%rip), %eax\n22: popq %rbp\n23: ret\n"];
 }

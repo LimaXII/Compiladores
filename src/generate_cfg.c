@@ -25,24 +25,20 @@ void generate_cfg_dot(AsmCodeList* asm_code_list) {
     int line_number=1;
 
     // Criação do primeiro bloco com as instruções padrão
-    printf("\tsubgraph cluster_%d {\n", block_id);
-    printf("\t\tlabel=\"Block %d\";\n", block_id);
-    printf("\t\t\"init_block\" [label=\"%d: pushq   %%rbp\\n", line_number);
-    printf("%d: movq    %%rsp, %%rbp\\n\"];\n", ++line_number);
+    printf("\t\"Block%d\" [label=\"%d: pushq   %%rbp\\n", block_id, line_number);
+    printf("%d: movq    %%rsp, %%rbp\\n", ++line_number);
     prev_block_id = block_id;
     block_id++;
 
     while (current != NULL) {
         // Verifica se a instrução é líder
         if (is_leader(current)) {
-            printf("\t\t\"Block%d\" -> \"Block%d\";\n\t}\n", prev_block_id, block_id);
-            printf("\tsubgraph cluster_%d {\n", block_id);
-            printf("\t\tlabel=\"Block %d\";\n", block_id);
+            printf("\"];\n");
+            printf("\t\"Block%d\" -> \"Block%d\";\n", prev_block_id, block_id);
+            printf("\t\"Block%d\" [label=\"", block_id);
             prev_block_id = block_id;
             block_id++;
         }
-
-        printf("\t\t\"%p\" [label=\"", (void*)current);
 
         // Imprimir a instrução com base no opcode
         switch (current->asm_code.opcode) {
@@ -188,11 +184,9 @@ void generate_cfg_dot(AsmCodeList* asm_code_list) {
                 printf("Instrução desconhecida.");
                 break;
         }
-
-        printf("\"];\n");
-
+        // Última instrução fecha o bloco
         if (current->next == NULL) {
-            printf("\t}\n");
+            printf("\"];\n");
         }
 
         current = current->next;
