@@ -169,7 +169,7 @@ void generate_cfg_dot(AsmCodeList* asm_code_list) {
                 printf("%d: movl %s, _temp_r_%d(%s)\\n", ++line_number, "%edx", current->asm_code.t3, "%rip");
                 break;
             case OP_STOREAI_GLOBAL:
-                printf("%d: movl _temp_r_%d(%s), %s\\n",line_number, current->asm_code.t1, "%rip", "%edx");
+                printf("%d: movl _temp_r_%d(%s), %s\\n",++line_number, current->asm_code.t1, "%rip", "%edx");
                 printf("%d: movl %s, global%d(%s)\\n", ++line_number, "%edx", current->asm_code.t3 / 4, "%rip");
                 break;
             case OP_STOREAI_LOCAL:
