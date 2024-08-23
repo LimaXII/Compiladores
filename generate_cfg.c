@@ -16,36 +16,34 @@ void generate_cfg_dot(IlocCodeList* iloc_code) {
     printf("digraph CFG {\n");
 
     IlocCodeList* current = iloc_code;
+    int label_block_id;
     int block_id = 0;
-    int prev_block_id = -1;
     int line_number = 0;
+    int isLabelBlock = 0;
     int after_jump = 0;
 
     // Primeiro bloco
-    if (current != NULL) {
-        printf("\t\"Block%d\" [label=\"", block_id);
-        block_id++;
-    }
+    printf("\t\"Block%d\" [label=\"", block_id);
 
     while (current != NULL) {
         // Verifica se a instrução é líder de bloco básico
         if (is_leader(current) && after_jump) {
-            if (prev_block_id != -1) {
-                printf("\t\"Block%d\" -> \"Block%d\";\n", prev_block_id, block_id - 1);
-            }
-            printf("\t\"Block%d\" [label=\"", current->iloc_code.t1);
-            prev_block_id = block_id;
-            block_id++;
+            printf("\t\"Block L%d\" [label=\"", current->iloc_code.t1);
             after_jump = 0;
+            isLabelBlock = 1;
+            label_block_id = current->iloc_code.t1;
         }
-        else if (is_leader(current) || after_jump) {
-            if (prev_block_id != -1) {
-                printf("\"];\n"); // Fecha o bloco anterior
-                printf("\t\"Block%d\" -> \"Block%d\";\n", prev_block_id, block_id - 1);
-            }
-            printf("\t\"Block%d\" [label=\"", block_id);
-            prev_block_id = block_id;
-            block_id++;
+        // Instrução de Label sem suceder um desvio
+        else if (is_leader(current)) {
+            printf("\"];\n"); // Fecha o bloco anterior
+            printf("\t\"Block L%d\" [label=\"", current->iloc_code.t1);
+            after_jump = 0;
+            isLabelBlock = 1;
+            label_block_id = current->iloc_code.t1;
+        // Instrução que sucede um desvio
+        } else if( after_jump) {
+            printf("\"];\n"); // Fecha o bloco anterior
+            printf("\t\"Block%d\" [label=\"", ++block_id);
             after_jump = 0;
         }
 
@@ -100,15 +98,26 @@ void generate_cfg_dot(IlocCodeList* iloc_code) {
                 printf("%d: cbr r%d => L%d, L%d\\n", ++line_number, current->iloc_code.t1, current->iloc_code.t3, current->iloc_code.t4);
                 // Conecta o bloco atual aos destinos do CBR
                 printf("\"];\n");
-                printf("\t\"Block%d\" -> \"Block%d\";\n", prev_block_id, current->iloc_code.t3);
-                printf("\t\"Block%d\" -> \"Block%d\";\n", prev_block_id, current->iloc_code.t4);
+                if (isLabelBlock) {
+                    printf("\t\"Block L%d\" -> \"Block L%d\";\n", label_block_id, current->iloc_code.t3);
+                    printf("\t\"Block L%d\" -> \"Block L%d\";\n", label_block_id, current->iloc_code.t4);
+                } else {
+                    printf("\t\"Block%d\" -> \"Block L%d\";\n", block_id, current->iloc_code.t3);
+                    printf("\t\"Block%d\" -> \"Block L%d\";\n", block_id, current->iloc_code.t4);
+                }
+                isLabelBlock = 0;
                 after_jump = 1;
                 break;
             case OP_JUMPI:
                 printf("%d: jumpI -> L%d\\n", ++line_number, current->iloc_code.t1);
                 printf("\"];\n");
                 // Conecta o bloco atual ao destino do jumpI
-                printf("\t\"Block%d\" -> \"Block%d\";\n", prev_block_id, current->iloc_code.t1);
+                if (isLabelBlock) {
+                    printf("\t\"Block L%d\" -> \"Block L%d\";\n", label_block_id, current->iloc_code.t1);
+                } else {
+                    printf("\t\"Block%d\" -> \"Block L%d\";\n", block_id, current->iloc_code.t1);
+                }
+                isLabelBlock = 0;
                 after_jump = 1;
                 break;
             case OP_LOADI:
