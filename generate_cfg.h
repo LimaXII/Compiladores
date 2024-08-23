@@ -1,3 +1,6 @@
+/* ======= GRUPO J ======= */
+/* Luccas da Silva Lima 00324683 */
+/* Matheus Almeida da Silva 00316326 */
 #ifndef CFG_H
 #define CFG_H
 

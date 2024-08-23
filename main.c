@@ -21,18 +21,11 @@ int main (int argc, char **argv)
   initialize_global_stack();
   int ret = yyparse();
 
-  if (mainFunctionNode && mainFunctionNode->iloc_code_list != NULL){
-    print_iloc_code_list(mainFunctionNode->iloc_code_list);
-  }
+  print_iloc_code_list(mainFunctionNode->iloc_code_list);
 
   generate_cfg_dot(mainFunctionNode->iloc_code_list);
   
-  //exporta (arvore);
   yylex_destroy();
-
-  //printf("Final stack state:\n");
-  //display_global_stack(100);
-
   free_table_stack(globalTableStack);
   free_tree(arvore);
   return ret;

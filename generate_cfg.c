@@ -12,6 +12,7 @@ int is_leader(IlocCodeList* instr) {
     }
 }
 
+// Função para gerar o grafo de controle de fluxo no formato DOT
 void generate_cfg_dot(IlocCodeList* iloc_code) {
     printf("digraph CFG {\n");
 
@@ -36,6 +37,7 @@ void generate_cfg_dot(IlocCodeList* iloc_code) {
         // Instrução de Label sem suceder um desvio
         else if (is_leader(current)) {
             printf("\"];\n"); // Fecha o bloco anterior
+            printf("\t\"Block L%d\" -> \"Block L%d\";\n", label_block_id, current->iloc_code.t1);
             printf("\t\"Block L%d\" [label=\"", current->iloc_code.t1);
             after_jump = 0;
             isLabelBlock = 1;
