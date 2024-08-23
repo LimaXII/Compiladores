@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include "table.h"
 #include "iloc.h"
+#include "generate_cfg.h"
 #include "ast_tree.h"
 
 extern int yyparse(void);
@@ -23,6 +24,8 @@ int main (int argc, char **argv)
   if (mainFunctionNode && mainFunctionNode->iloc_code_list != NULL){
     print_iloc_code_list(mainFunctionNode->iloc_code_list);
   }
+
+  generate_cfg_dot(mainFunctionNode->iloc_code_list);
   
   //exporta (arvore);
   yylex_destroy();

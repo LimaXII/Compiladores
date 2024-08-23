@@ -77,76 +77,76 @@ void print_iloc_code_list(IlocCodeList* head) {
     while (current) {
         switch (current->iloc_code.opcode) {
             case OP_NOP:
-                printf("nop\n");
+                printf("#nop\n");
                 break;
             case OP_ADD:
-                printf("add r%d, r%d => r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
+                printf("#add r%d, r%d => r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
                 break;
             case OP_SUB:
-                printf("sub r%d, r%d => r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
+                printf("#sub r%d, r%d => r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
                 break;
             case OP_MULT:
-                printf("mult r%d, r%d => r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
+                printf("#mult r%d, r%d => r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
                 break;
             case OP_DIV:
-                printf("div r%d, r%d => r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
+                printf("#div r%d, r%d => r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
                 break;
             case OP_NEG:
-                printf("rsubI r%d, 0 => r%d\n", current->iloc_code.t1, current->iloc_code.t3);
+                printf("#rsubI r%d, 0 => r%d\n", current->iloc_code.t1, current->iloc_code.t3);
                 break;
             case OP_NEG_LOG:
-                printf("xorI r%d, -1 => r%d\n", current->iloc_code.t1, current->iloc_code.t3);
+                printf("#xorI r%d, -1 => r%d\n", current->iloc_code.t1, current->iloc_code.t3);
                 break;
             case OP_AND:
-                printf("and r%d, r%d => r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
+                printf("#and r%d, r%d => r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
                 break;
             case OP_OR:
-                printf("or r%d, r%d => r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
+                printf("#or r%d, r%d => r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
                 break;
             case OP_CMP_EQ:
-                printf("cmp_EQ r%d, r%d -> r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
+                printf("#cmp_EQ r%d, r%d -> r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
                 break;
             case OP_CMP_NE:
-                printf("cmp_NE r%d, r%d -> r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
+                printf("#cmp_NE r%d, r%d -> r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
                 break;
             case OP_CMP_GT:
-                printf("cmp_GT r%d, r%d -> r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
+                printf("#cmp_GT r%d, r%d -> r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
                 break;
             case OP_CMP_LT:
-                printf("cmp_LT r%d, r%d -> r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
+                printf("#cmp_LT r%d, r%d -> r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
                 break;
             case OP_CMP_GE:
-                printf("cmp_GE r%d, r%d -> r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
+                printf("#cmp_GE r%d, r%d -> r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
                 break;
             case OP_CMP_LE:
-                printf("cmp_LE r%d, r%d -> r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
+                printf("#cmp_LE r%d, r%d -> r%d\n", current->iloc_code.t1, current->iloc_code.t2, current->iloc_code.t3);
                 break;
             case OP_CBR:
-                printf("cbr r%d -> L%d, L%d\n", current->iloc_code.t1, current->iloc_code.t3, current->iloc_code.t4);
+                printf("#cbr r%d -> L%d, L%d\n", current->iloc_code.t1, current->iloc_code.t3, current->iloc_code.t4);
                 break;
             case OP_JUMPI:
-                printf("jumpI -> L%d\n", current->iloc_code.t1);
+                printf("#jumpI -> L%d\n", current->iloc_code.t1);
                 break;
             case OP_LOADI:
-                printf("loadI %d => r%d\n", current->iloc_code.t1, current->iloc_code.t3);
+                printf("#loadI %d => r%d\n", current->iloc_code.t1, current->iloc_code.t3);
                 break;
             case OP_LOADAI_GLOBAL:
-                printf("loadAI rbss, %d => r%d\n", current->iloc_code.t1, current->iloc_code.t3);
+                printf("#loadAI rbss, %d => r%d\n", current->iloc_code.t1, current->iloc_code.t3);
                 break;
             case OP_LOADAI_LOCAL:
-                printf("loadAI rfp, %d => r%d\n", current->iloc_code.t1, current->iloc_code.t3);
+                printf("#loadAI rfp, %d => r%d\n", current->iloc_code.t1, current->iloc_code.t3);
                 break;
             case OP_STOREAI_GLOBAL:
-                printf("storeAI r%d => rbss, %d\n", current->iloc_code.t1, current->iloc_code.t3);
+                printf("#storeAI r%d => rbss, %d\n", current->iloc_code.t1, current->iloc_code.t3);
                 break;
             case OP_STOREAI_LOCAL:
-                printf("storeAI r%d => rfp, %d\n", current->iloc_code.t1, current->iloc_code.t3);
+                printf("#storeAI r%d => rfp, %d\n", current->iloc_code.t1, current->iloc_code.t3);
                 break;
             case OP_LABEL:
-                printf("L%d: ", current->iloc_code.t1);
+                printf("#L%d: \n", current->iloc_code.t1);
                 break;
             default:
-                printf("Instrução desconhecida.\n");
+                printf("#Instrução desconhecida.\n");
                 break;
         }
         current = current->next;
